@@ -1,7 +1,9 @@
 import 'package:clean_temp/models/case/case_model.dart';
 
 class LevelGenerator {
-  static List<CaseModel> generateLevelComplet(dynamic leveljson) {
+  static ({List<CaseModel> cases, CaseModel firstTagCase}) generateLevelComplet(
+    dynamic leveljson,
+  ) {
     final List<dynamic> balisesPoints =
         leveljson['balisesPoints'] as List<dynamic>;
 
@@ -57,6 +59,11 @@ class LevelGenerator {
         );
       }
     }
-    return casesFinales;
+        final CaseModel firstCase = casesFinales.firstWhere(
+      (c) => c.numberTag == 1,
+      orElse: () => throw Exception("Balise de départ (Tag 1) non trouvée."),
+    );
+
+    return (cases: casesFinales , firstTagCase: firstCase);
   }
 }

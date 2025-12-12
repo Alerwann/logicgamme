@@ -23,7 +23,6 @@ class HiveService {
 
       final levelsBox = Hive.box<LevelModel>('levelsBox');
 
-      // Déléguer la logique complexe de mise à jour à une fonction dédiée
       return _synchroLevels(allConfigs, levelsBox);
     } catch (e) {
       if (kDebugMode) {
@@ -57,18 +56,26 @@ class HiveService {
     }
   }
 
-  (bool, String) _synchroLevels(
+  Future<(bool, String)> _synchroLevels(
     List<Map<String, dynamic>> allConfigs,
     Box<LevelModel> levelsBox,
-  ) {
+  ) async {
     int debutIndex = levelsBox.length;
 
     int finIndex = min(levelsBox.length + 5, allConfigs.length);
     for (int i = debutIndex; i < finIndex; i++) {
-      List<CaseModel> listCase = LevelGenerator.generateLevelComplet(
-        allConfigs[i],
+      final result = LevelGenerator.generateLevelComplet(allConfigs[i]);
+
+      // Et accéder aux valeurs du Record comme ceci :
+      final List<CaseModel> casesFinales = result.cases;
+      final CaseModel firstCase = result.firstTagCase;
+
+      // Vous pouvez maintenant utiliser ces variables pour construire le LevelModel :
+      LevelModel value = LevelModel(
+        levelId: i,
+        cases: casesFinales,
+        firstCase: firstCase, // Utilise la CaseModel complète
       );
-      LevelModel value = LevelModel(levelId: i, cases: listCase);
       levelsBox.put(i, value);
     }
     return (true, "Les niveaux ont été initialisé, Bonne chance");

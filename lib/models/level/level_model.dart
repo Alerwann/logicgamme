@@ -14,18 +14,21 @@ class LevelModel extends HiveObject {
 
   @HiveField(2)
   // meilleur temps enregistré
-  int bestRecordNormalSeconds;
+  late int bestRecordNormalSeconds;
 
   @HiveField(3)
   // boolean qui indique si le jouer choisi le niveau hard ou facile
   bool hardDifficulty;
 
+  @HiveField(4)
+  //premiere case de jeux
+  CaseModel firstCase;
+
   LevelModel({
     required this.levelId,
     required this.cases,
     this.bestRecordNormalSeconds = 99999,
-    this.hardDifficulty =false,
+    this.hardDifficulty = false,
+    required this.firstCase,
   });
-
-  
 }
