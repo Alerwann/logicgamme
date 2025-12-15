@@ -80,4 +80,21 @@ class HiveService {
     }
     return (true, "Les niveaux ont été initialisé, Bonne chance");
   }
+
+  Future<void> saveRecord(int levelId, int newTimeInSeconds) async {
+    try {
+      final levelsBox = Hive.box<LevelModel>('levelsBox');
+
+      LevelModel? level = levelsBox.get(levelId);
+
+      if (level != null) {
+        level.bestRecordNormalSeconds = newTimeInSeconds;
+        await level.save();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Erreur de sauvegarde de record Hive : $e");
+      }
+    }
+  }
 }
