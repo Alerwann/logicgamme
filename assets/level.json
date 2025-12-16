@@ -2,7 +2,10 @@
   {
     "levelId": 0,
     "tailleGrille": 6,
-    "balisesPoints": [],
+    "balisesPoints": [
+      [1, 1],
+      [5, 5]
+    ],
     "wallH": [],
     "wallV": []
   },

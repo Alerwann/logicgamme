@@ -1,7 +1,15 @@
 // Ensemble des enums
 
-enum DifficultyGame {normal, difficile}
+enum DifficultyGame { normal, difficile }
 
-enum EtatGame {loading,isPlaying, win, loose, pause }
+enum EtatGame { loading, isPlaying, win, loose, pause }
 
-enum MoveStatusCode {success, successLastTag, wallError, tagError, alreadyVisitedError ,notOrthoError, internalError}
+enum MoveStatusCode {
+  success,
+  successlastTagCheck,
+  wallError,
+  tagError,
+  alreadyVisitedError,
+  notOrthoError,
+  internalError,
+}

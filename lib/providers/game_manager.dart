@@ -47,7 +47,7 @@ class GameManager extends StateNotifier<SessionState> {
       levelConfig: niveau,
       roadList: [niveau.firstCase],
       roadSet: {niveau.firstCase},
-      lastTag: 1,
+      lastTagSave: 1,
       statutPartie: EtatGame.isPlaying,
     );
   }
@@ -105,8 +105,7 @@ class GameManager extends StateNotifier<SessionState> {
         state.roadList.last == newCase) {
       return;
     }
-    // ajout de la vérification que la partie n'avait pas débuté avant
-    //car le jouer peut annuler et revenir au début c'est pas pour autant que le timer doit etre relancé
+
     if (_tempsEcoule.inSeconds == 0 && state.roadSet.length == 1) {
       _startTimer(state.levelConfig);
     }
@@ -122,7 +121,7 @@ class GameManager extends StateNotifier<SessionState> {
       case MoveStatusCode.success:
         state = result.sessionState;
         break;
-      case MoveStatusCode.successLastTag:
+      case MoveStatusCode.successlastTagCheck:
         {
           state = result.sessionState;
           _checkEndGame();

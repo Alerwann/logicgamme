@@ -24,11 +24,16 @@ class LevelModel extends HiveObject {
   //premiere case de jeux
   CaseModel firstCase;
 
+  @HiveField(5)
+  //numéro de la dernière balise
+  int maxTag;
+
   LevelModel({
     required this.levelId,
     required this.cases,
     this.bestRecordNormalSeconds = 99999,
     this.hardDifficulty = false,
     required this.firstCase,
+    required this.maxTag
   });
 }

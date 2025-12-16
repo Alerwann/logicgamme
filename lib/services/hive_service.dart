@@ -69,12 +69,13 @@ class HiveService {
       // Et accéder aux valeurs du Record comme ceci :
       final List<CaseModel> casesFinales = result.cases;
       final CaseModel firstCase = result.firstTagCase;
+      final int maxTag = result.maxTag;
 
-      // Vous pouvez maintenant utiliser ces variables pour construire le LevelModel :
       LevelModel value = LevelModel(
         levelId: i,
         cases: casesFinales,
-        firstCase: firstCase, // Utilise la CaseModel complète
+        firstCase: firstCase,
+        maxTag: maxTag,
       );
       levelsBox.put(i, value);
     }
