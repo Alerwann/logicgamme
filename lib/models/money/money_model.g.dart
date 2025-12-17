@@ -1,32 +1,32 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'game_state_model.dart';
+part of 'money_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class GameStateModelAdapter extends TypeAdapter<GameStateModel> {
+class MoneyModelAdapter extends TypeAdapter<MoneyModel> {
   @override
   final int typeId = 2;
 
   @override
-  GameStateModel read(BinaryReader reader) {
+  MoneyModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return GameStateModel(
+    return MoneyModel(
       bestLevel: fields[0] as int,
       bonusDaily: fields[1] as int,
       gemeStock: fields[2] as int,
-      freeHardBonus: fields[3] as bool,
+      freeHardBonus: fields[3] as int,
       resetDate: fields[4] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, GameStateModel obj) {
+  void write(BinaryWriter writer, MoneyModel obj) {
     writer
       ..writeByte(5)
       ..writeByte(0)
@@ -47,7 +47,7 @@ class GameStateModelAdapter extends TypeAdapter<GameStateModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is GameStateModelAdapter &&
+      other is MoneyModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

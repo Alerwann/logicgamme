@@ -15,16 +15,11 @@ class LevelModel extends HiveObject {
   @HiveField(2)
   // meilleur temps enregistré
   late int bestRecordNormalSeconds;
-
-  @HiveField(3)
-  // boolean qui indique si le jouer choisi le niveau hard ou facile
-  bool hardDifficulty;
-
-  @HiveField(4)
+@HiveField(3)
   //premiere case de jeux
   CaseModel firstCase;
 
-  @HiveField(5)
+  @HiveField(4)
   //numéro de la dernière balise
   int maxTag;
 
@@ -32,8 +27,17 @@ class LevelModel extends HiveObject {
     required this.levelId,
     required this.cases,
     this.bestRecordNormalSeconds = 99999,
-    this.hardDifficulty = false,
     required this.firstCase,
-    required this.maxTag
+    required this.maxTag,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LevelModel &&
+          runtimeType == other.runtimeType &&
+          levelId == other.levelId; 
+
+  @override
+  int get hashCode => levelId.hashCode;
 }

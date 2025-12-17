@@ -1,13 +1,18 @@
 import 'package:clean_temp/data/enum.dart';
 import 'package:clean_temp/models/case/case_model.dart';
 import 'package:clean_temp/models/level/level_model.dart';
+import 'package:clean_temp/models/money/money_model.dart';
 
 class SessionState {
   final LevelModel levelConfig;
   final List<CaseModel> roadList;
   final Set<CaseModel> roadSet;
   final int lastTagSave;
+
   final EtatGame statutPartie;
+  final TypeDifficulty difficultyMode;
+
+  final MoneyModel moneyData;
 
   SessionState({
     required this.levelConfig,
@@ -15,6 +20,8 @@ class SessionState {
     required this.roadSet,
     required this.lastTagSave,
     required this.statutPartie,
+    required this.difficultyMode,
+    required this.moneyData
   });
 
   SessionState copyWith({
@@ -23,6 +30,8 @@ class SessionState {
     Set<CaseModel>? roadSet,
     int? lastTagSave,
     EtatGame? statutPartie,
+    TypeDifficulty? difficultyMode,
+    MoneyModel? moneyData
   }) {
     return SessionState(
       levelConfig: levelConfig ?? this.levelConfig,
@@ -30,6 +39,8 @@ class SessionState {
       roadSet: roadSet ?? this.roadSet,
       lastTagSave: lastTagSave ?? this.lastTagSave,
       statutPartie: statutPartie ?? this.statutPartie,
+      difficultyMode: difficultyMode ?? this.difficultyMode,
+      moneyData: moneyData?? this.moneyData,
     );
   }
 }

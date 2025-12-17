@@ -2,7 +2,7 @@
 
 enum DifficultyGame { normal, difficile }
 
-enum EtatGame { loading, isPlaying, win, loose, pause }
+enum EtatGame { loading, isPlaying, win, loose, pause, waitDifficulty, waitAddTime, chooseDifficulty, chooseAddTime }
 
 enum MoveStatusCode {
   success,
@@ -12,4 +12,15 @@ enum MoveStatusCode {
   alreadyVisitedError,
   notOrthoError,
   internalError,
+}
+
+
+enum TypeBonus{
+bonusTime,
+bonusDifficulty
+}
+
+enum TypeDifficulty{
+normal,
+hard
 }
