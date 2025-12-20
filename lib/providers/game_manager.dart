@@ -143,13 +143,13 @@ class GameManager extends StateNotifier<SessionState> {
 
   Future<void> _saveWinGame() async {
     try {
-      (bool, MoneyModel) returnState = await _moneyService.handleWinGame(
+     ResultActionBonus returnState = await _moneyService.handleWinGame(
         levelId: state.levelConfig.levelId,
         difficultyMode: state.difficultyMode,
         moneyState: state.moneyData,
       );
-      if (returnState.$1) {
-        state = state.copyWith(moneyData: returnState.$2);
+      if (returnState.isDo) {
+        state = state.copyWith(moneyData: returnState.state);
         _ref.read(messageProvider.notifier).state =
             "Bravo! Vos récompenses sont à jour";
       } else {
@@ -242,6 +242,10 @@ class GameManager extends StateNotifier<SessionState> {
       case MoveStatusCode.internalError:
         _ref.read(messageProvider.notifier).state =
             "Erreur de l'application. Merci de contacter le créateur";
+        break;
+      case MoveStatusCode.successCancel:
+        _ref.read(messageProvider.notifier).state =
+            "Annulation du chemin effectuée";
     }
   }
 
@@ -250,16 +254,16 @@ class GameManager extends StateNotifier<SessionState> {
   Future<void> difficultyChoose(bool chooseHard) async {
     if (!chooseHard) {
       state = state.copyWith(statutPartie: EtatGame.isPlaying);
-    }else{
-        try {
+    } else {
+      try {
         final resultBuy = await _moneyService.buyBonus(
           state.moneyData,
           TypeBonus.bonusDifficulty,
         );
 
-        if (resultBuy.$1) {
+        if (resultBuy.isDo) {
           state = state.copyWith(
-            moneyData: resultBuy.$2,
+            moneyData: resultBuy.state,
             difficultyMode: TypeDifficulty.hard,
             statutPartie: EtatGame.isPlaying,
           );
@@ -276,24 +280,21 @@ class GameManager extends StateNotifier<SessionState> {
             "Echec du changement de niveau de difficultés. Niveau joué en normal";
       }
     }
-
   }
 
   Future<void> addTimechoose(bool chooseTime) async {
-    if(!chooseTime){
-    
+    if (!chooseTime) {
       state = state.copyWith(statutPartie: EtatGame.isPlaying);
-    }
-    else{
+    } else {
       try {
         final resultBuy = await _moneyService.buyBonus(
           state.moneyData,
           TypeBonus.bonusTime,
         );
 
-        if (resultBuy.$1) {
+        if (resultBuy.isDo) {
           state = state.copyWith(
-            moneyData: resultBuy.$2,
+            moneyData: resultBuy.state,
             difficultyMode: TypeDifficulty.normal,
             statutPartie: EtatGame.isPlaying,
           );
@@ -309,8 +310,6 @@ class GameManager extends StateNotifier<SessionState> {
       }
     }
   }
-    
-   
 }
 
 final gameManagerProvider =

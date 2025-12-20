@@ -1,8 +1,16 @@
 // Ensemble des enums
 
-enum DifficultyGame { normal, difficile }
-
-enum EtatGame { loading, isPlaying, win, loose, pause, waitDifficulty, waitAddTime, chooseDifficulty, chooseAddTime }
+enum EtatGame {
+  loading,
+  isPlaying,
+  win,
+  loose,
+  pause,
+  waitDifficulty,
+  waitAddTime,
+  chooseDifficulty,
+  chooseAddTime,
+}
 
 enum MoveStatusCode {
   success,
@@ -12,15 +20,13 @@ enum MoveStatusCode {
   alreadyVisitedError,
   notOrthoError,
   internalError,
+  successCancel,
 }
 
+enum TypeMove { vertical, horizontal }
 
-enum TypeBonus{
-bonusTime,
-bonusDifficulty
-}
+enum TypeBonus { bonusTime, bonusDifficulty }
 
-enum TypeDifficulty{
-normal,
-hard
-}
+enum TypeDifficulty { normal, hard }
+
+enum BuyStatusCode { success, saveKO, actionKo }

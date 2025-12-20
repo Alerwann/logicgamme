@@ -1,4 +1,5 @@
 import 'package:clean_temp/models/case/case_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 part 'level_model.g.dart';
@@ -15,7 +16,7 @@ class LevelModel extends HiveObject {
   @HiveField(2)
   // meilleur temps enregistré
   late int bestRecordNormalSeconds;
-@HiveField(3)
+  @HiveField(3)
   //premiere case de jeux
   CaseModel firstCase;
 
@@ -36,8 +37,13 @@ class LevelModel extends HiveObject {
       identical(this, other) ||
       other is LevelModel &&
           runtimeType == other.runtimeType &&
-          levelId == other.levelId; 
+          levelId == other.levelId &&
+          listEquals(cases, other.cases) &&
+       
+          bestRecordNormalSeconds == other.bestRecordNormalSeconds &&
+          firstCase == other.firstCase &&
+          maxTag == other.maxTag;
 
   @override
-  int get hashCode => levelId.hashCode;
+  int get hashCode => levelId.hashCode^ Object.hashAll(cases) ^ bestRecordNormalSeconds.hashCode ^ firstCase.hashCode ^ maxTag;
 }

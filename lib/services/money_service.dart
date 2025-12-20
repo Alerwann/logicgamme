@@ -1,7 +1,7 @@
 import 'package:clean_temp/data/constants.dart';
 import 'package:clean_temp/data/enum.dart';
 import 'package:clean_temp/models/money/money_model.dart';
-
+import 'package:flutter/foundation.dart';
 
 class MoneyService {
   // gestion de la vérification
@@ -27,13 +27,31 @@ class MoneyService {
 
   //Gestion des Achats
 
-  Future<(bool, MoneyModel)> buyBonus(
+  Future<ResultActionBonus> buyBonus(
     MoneyModel moneyState,
     TypeBonus type,
   ) async {
     MoneyModel newState;
+
+    final testBuy = testTypeBuyBonus(type, moneyState);
+
+    if (!testBuy.$1) {
+      return ResultActionBonus(
+        isDo: false,
+        statusCode: BuyStatusCode.actionKo,
+        state: moneyState,
+      );
+    } else {
+      newState = testBuy.$2;
+    }
+    return await saveMoneyModel(newState, moneyState);
+  }
+
+  (bool, MoneyModel) testTypeBuyBonus(TypeBonus type, MoneyModel moneyState) {
+    MoneyModel newState;
     int countBonus;
     int costBonus;
+
     switch (type) {
       case TypeBonus.bonusTime:
         countBonus = moneyState.bonusDaily;
@@ -47,38 +65,41 @@ class MoneyService {
 
     if (countBonus > 0) {
       final newCountBonus = countBonus - 1;
+
       if (type == TypeBonus.bonusTime) {
         newState = moneyState.copyWith(bonusDaily: newCountBonus);
       } else {
         newState = moneyState.copyWith(freeHardBonus: newCountBonus);
       }
+      return (true, newState);
     } else if (moneyState.gemeStock >= costBonus) {
       final newCountGemme = moneyState.gemeStock - costBonus;
       newState = moneyState.copyWith(gemeStock: newCountGemme);
-    } else {
-      return (false, moneyState);
-    }
-
-    try {
-      await newState.save();
       return (true, newState);
-    } catch (e) {
+    } else {
       return (false, moneyState);
     }
   }
 
-
-// Gestion de la victoire
-  Future<(bool, MoneyModel)> handleWinGame({
+  // Gestion de la victoire
+  Future<ResultActionBonus> handleWinGame({
     required int levelId,
-
     required TypeDifficulty difficultyMode,
     required MoneyModel moneyState,
   }) async {
-    MoneyModel stateToUpdate;
-    int winGemme;
+    final stateToUpdate = niveauCalculate(levelId, moneyState, difficultyMode);
 
-    //gestion des gains de gemmes
+    return saveMoneyModel(stateToUpdate, moneyState);
+  }
+
+  MoneyModel niveauCalculate(
+    int levelId,
+    MoneyModel moneyState,
+    TypeDifficulty difficultyMode,
+  ) {
+    int winGemme;
+    MoneyModel stateToUpdate;
+
     switch (difficultyMode) {
       case TypeDifficulty.normal:
         winGemme = Constants.GAIN_NORMAL + moneyState.gemeStock;
@@ -88,7 +109,6 @@ class MoneyService {
         break;
     }
 
-    //evolution du niveau
     if (levelId == moneyState.bestLevel) {
       stateToUpdate = moneyState.copyWith(
         bestLevel: levelId + 1,
@@ -97,13 +117,42 @@ class MoneyService {
     } else {
       stateToUpdate = moneyState.copyWith(gemeStock: winGemme);
     }
-    //tentative de sauvegarde de l'état
-    try {
-      await stateToUpdate.save();
 
-      return (true, stateToUpdate);
-    } catch (e) {
-      return (false, moneyState);
-    }
+    return stateToUpdate;
   }
+
+  Future<ResultActionBonus> saveMoneyModel(
+    MoneyModel newState,
+    MoneyModel oldState,
+  ) async {
+    try {
+      await newState.save();
+    } catch (e) {
+      if (kDebugMode) {
+        print("erreur de la sauvegarde de money : $e");
+        return ResultActionBonus(
+          isDo: false,
+          statusCode: BuyStatusCode.saveKO,
+          state: oldState,
+        );
+      }
+    }
+    return ResultActionBonus(
+      isDo: true,
+      statusCode: BuyStatusCode.success,
+      state: newState,
+    );
+  }
+}
+
+class ResultActionBonus {
+  final bool isDo;
+  final BuyStatusCode statusCode;
+  final MoneyModel state;
+
+  ResultActionBonus({
+    required this.isDo,
+    required this.statusCode,
+    required this.state,
+  });
 }

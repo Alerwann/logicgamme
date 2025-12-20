@@ -24,5 +24,23 @@ class CaseModel extends HiveObject {
     required this.wallV,
     this.numberTag,
   });
-}
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CaseModel &&
+          runtimeType == other.runtimeType &&
+          xValue == other.xValue &&
+          yValue == other.yValue &&
+          wallH == other.wallH &&
+          wallV == other.wallV &&
+          numberTag == other.numberTag;
+
+  @override
+  int get hashCode =>
+      xValue.hashCode ^
+      yValue.hashCode ^
+      wallH.hashCode ^
+      wallV.hashCode ^
+      numberTag.hashCode;
+}

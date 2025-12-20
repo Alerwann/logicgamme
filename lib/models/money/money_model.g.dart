@@ -21,14 +21,13 @@ class MoneyModelAdapter extends TypeAdapter<MoneyModel> {
       bonusDaily: fields[1] as int,
       gemeStock: fields[2] as int,
       freeHardBonus: fields[3] as int,
-      resetDate: fields[4] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, MoneyModel obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.bestLevel)
       ..writeByte(1)
@@ -36,9 +35,7 @@ class MoneyModelAdapter extends TypeAdapter<MoneyModel> {
       ..writeByte(2)
       ..write(obj.gemeStock)
       ..writeByte(3)
-      ..write(obj.freeHardBonus)
-      ..writeByte(4)
-      ..write(obj.resetDate);
+      ..write(obj.freeHardBonus);
   }
 
   @override

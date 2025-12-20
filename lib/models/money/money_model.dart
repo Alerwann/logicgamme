@@ -1,11 +1,9 @@
-
 import 'package:hive/hive.dart';
 
 part 'money_model.g.dart';
 
 @HiveType(typeId: 2)
 class MoneyModel extends HiveObject {
-
   @HiveField(0)
   //L'id du dernier niveau atteint par le joueur
   int bestLevel;
@@ -19,16 +17,12 @@ class MoneyModel extends HiveObject {
   @HiveField(3)
   // 1 fois par jour le joueur peut échouer gratuitement à un mode HARD
   int freeHardBonus;
-  @HiveField(4)
-  // Date du prochain reset des bonus quotidiens
-  DateTime resetDate;
 
   MoneyModel({
     required this.bestLevel,
     required this.bonusDaily,
     required this.gemeStock,
     required this.freeHardBonus,
-    required this.resetDate,
   });
 
   factory MoneyModel.initial() {
@@ -37,7 +31,6 @@ class MoneyModel extends HiveObject {
       bonusDaily: 3,
       gemeStock: 0,
       freeHardBonus: 1,
-      resetDate: DateTime.now().subtract(Duration(days: 1)),
     );
   }
 
@@ -46,16 +39,32 @@ class MoneyModel extends HiveObject {
     int? bonusDaily,
     int? gemeStock,
     int? freeHardBonus,
-    DateTime? resetDate,
   }) {
     return MoneyModel(
       bestLevel: bestLevel ?? this.bestLevel,
       bonusDaily: bonusDaily ?? this.bonusDaily,
       gemeStock: gemeStock ?? this.gemeStock,
       freeHardBonus: freeHardBonus ?? this.freeHardBonus,
-      resetDate: resetDate ?? this.resetDate,
     );
   }
 
+  // ignore: strict_top_level_inference
   static empty() {}
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is MoneyModel &&
+      runtimeType == other.runtimeType &&
+          bestLevel == other.bestLevel &&
+          bonusDaily == other.bonusDaily &&
+          gemeStock == other.gemeStock &&
+          freeHardBonus ==other.freeHardBonus;
+
+  @override
+  int get hashCode =>
+      bestLevel.hashCode ^
+      bonusDaily.hashCode ^
+      gemeStock.hashCode ^
+      freeHardBonus.hashCode;
 }
