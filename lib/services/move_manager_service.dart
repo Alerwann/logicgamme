@@ -57,28 +57,26 @@ class MoveManagerService {
       direction,
     );
     // si liste crée inférieur à la liste espérée -> problème de chargement
-    if (casesList.length < expectedLength) {
+    if (casesList.length != expectedLength) {
       return MoveResult(
         sessionState: state,
         statusCode: MoveStatusCode.internalError,
       );
     }
     // si liste plus grande à l'espérance -> problème de déjà passer ou chargement
-    if (casesList.length > expectedLength) {
-      final resultAllreadyPass = testAlreadyPass(state.roadSet, casesList);
+    
+
+  
+    final resultAllreadyPass = testAlreadyPass(state.roadSet, casesList);
+
       if (resultAllreadyPass.$1) {
         return MoveResult(
           sessionState: state,
           statusCode: MoveStatusCode.alreadyVisitedError,
           errorCase: resultAllreadyPass.$2,
         );
-      } else {
-        return MoveResult(
-          sessionState: state,
-          statusCode: MoveStatusCode.internalError,
-        );
-      }
-    }
+      } 
+
 
     //test des tags et leur ordre
     final resultTagTest = testOderTag(state.lastTagSave, casesList);
@@ -153,12 +151,12 @@ class MoveManagerService {
 
     switch (typeMove) {
       case TypeMove.vertical:
-        start = road.last.yValue + 1;
+        start = road.last.yValue + step;
         end = newCase.yValue;
         fixCoordonne = road.last.xValue;
         break;
       case TypeMove.horizontal:
-        start = road.last.xValue + 1;
+        start = road.last.xValue + step;
         end = newCase.xValue;
         fixCoordonne = road.last.yValue;
         break;
@@ -194,13 +192,13 @@ class MoveManagerService {
 
     if (typeMove == TypeMove.horizontal) {
       for (final caseSearch in allPathCases) {
-        if (caseSearch.wallV && caseSearch != caseTonotVerif) {
+        if (caseSearch.wallV!=null && caseSearch != caseTonotVerif) {
           return (true, caseSearch);
         }
       }
     } else if (typeMove == TypeMove.vertical) {
       for (final caseSearch in allPathCases) {
-        if (caseSearch.wallH && caseSearch != caseTonotVerif) {
+        if (caseSearch.wallH!=null && caseSearch != caseTonotVerif) {
           return (true, caseSearch);
         }
       }

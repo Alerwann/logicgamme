@@ -3,8 +3,8 @@
     "levelId": 0,
     "tailleGrille": 6,
     "balisesPoints": [
-      [1, 1],
-      [5, 5]
+      [0, 0],
+      [4, 4]
     ],
     "wallH": [],
     "wallV": []

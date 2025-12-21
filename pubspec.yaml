@@ -22,6 +22,7 @@ dependencies:
   hive_flutter: ^1.1.0
   provider: ^6.1.5+1
   flutter_riverpod: ^2.5.5
+  collection: ^1.19.1
 
   # flutter_launcher_icons pour l'icon de l'app
 

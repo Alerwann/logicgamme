@@ -39,11 +39,15 @@ class LevelModel extends HiveObject {
           runtimeType == other.runtimeType &&
           levelId == other.levelId &&
           listEquals(cases, other.cases) &&
-       
           bestRecordNormalSeconds == other.bestRecordNormalSeconds &&
           firstCase == other.firstCase &&
           maxTag == other.maxTag;
 
   @override
-  int get hashCode => levelId.hashCode^ Object.hashAll(cases) ^ bestRecordNormalSeconds.hashCode ^ firstCase.hashCode ^ maxTag;
+  int get hashCode =>
+      levelId.hashCode ^
+      Object.hashAll(cases) ^
+      bestRecordNormalSeconds.hashCode ^
+      firstCase.hashCode ^
+      maxTag;
 }

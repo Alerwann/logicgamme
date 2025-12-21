@@ -30,3 +30,5 @@ enum TypeBonus { bonusTime, bonusDifficulty }
 enum TypeDifficulty { normal, hard }
 
 enum BuyStatusCode { success, saveKO, actionKo }
+
+enum CodeLevelGenerator { success,successLoadAll, countLevelKo, countTagKo , levelNotExist}

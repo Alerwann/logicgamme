@@ -12,25 +12,25 @@ void main() {
   final LevelModel level = LevelModel(
     levelId: 1,
     cases: [
-      CaseModel(xValue: 0, yValue: 0, wallH: false, wallV: true, numberTag: 1),
-      CaseModel(xValue: 0, yValue: 1, wallH: true, wallV: false),
-      CaseModel(xValue: 0, yValue: 2, wallH: false, wallV: false),
-      CaseModel(xValue: 0, yValue: 3, wallH: false, wallV: false),
+      CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1),
+      CaseModel(xValue: 0, yValue: 1, wallH: true),
+      CaseModel(xValue: 0, yValue: 2),
+      CaseModel(xValue: 0, yValue: 3),
 
-      CaseModel(xValue: 1, yValue: 0, wallH: false, wallV: false),
-      CaseModel(xValue: 1, yValue: 1, wallH: false, wallV: false),
-      CaseModel(xValue: 1, yValue: 2, wallH: false, wallV: false),
-      CaseModel(xValue: 1, yValue: 3, wallH: false, wallV: false),
+      CaseModel(xValue: 1, yValue: 0),
+      CaseModel(xValue: 1, yValue: 1),
+      CaseModel(xValue: 1, yValue: 2),
+      CaseModel(xValue: 1, yValue: 3),
 
-      CaseModel(xValue: 2, yValue: 0, wallH: false, wallV: false, numberTag: 2),
-      CaseModel(xValue: 2, yValue: 1, wallH: false, wallV: false),
-      CaseModel(xValue: 2, yValue: 2, wallH: false, wallV: false),
-      CaseModel(xValue: 2, yValue: 3, wallH: false, wallV: false),
+      CaseModel(xValue: 2, yValue: 0, numberTag: 2),
+      CaseModel(xValue: 2, yValue: 1),
+      CaseModel(xValue: 2, yValue: 2),
+      CaseModel(xValue: 2, yValue: 3),
 
-      CaseModel(xValue: 3, yValue: 0, wallH: false, wallV: false, numberTag: 4),
-      CaseModel(xValue: 3, yValue: 1, wallH: false, wallV: false),
-      CaseModel(xValue: 3, yValue: 2, wallH: false, wallV: false),
-      CaseModel(xValue: 3, yValue: 3, wallH: false, wallV: false),
+      CaseModel(xValue: 3, yValue: 0, numberTag: 4),
+      CaseModel(xValue: 3, yValue: 1),
+      CaseModel(xValue: 3, yValue: 2),
+      CaseModel(xValue: 3, yValue: 3),
     ],
     firstCase: CaseModel(
       xValue: 0,
@@ -51,12 +51,8 @@ void main() {
 
   final SessionState sessionG = SessionState(
     levelConfig: level,
-    roadList: [
-          CaseModel(xValue: 0, yValue: 0, wallH: false, wallV: true, numberTag: 1),
-    ],
-    roadSet: {
-      CaseModel(xValue: 0, yValue: 0, wallH: false, wallV: true, numberTag: 1),
-    },
+    roadList: [CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1)],
+    roadSet: {CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1)},
     lastTagSave: 1,
     statutPartie: EtatGame.isPlaying,
     difficultyMode: TypeDifficulty.normal,
@@ -65,12 +61,7 @@ void main() {
 
   group('move-manage - case gestion', () {
     test('retourner cases grâce aux coordonnées', () {
-      final caseExpect = CaseModel(
-        xValue: 1,
-        yValue: 1,
-        wallH: true,
-        wallV: false,
-      );
+      final caseExpect = CaseModel(xValue: 1, yValue: 1);
 
       final result = moveManageService.getCaseByCoordinates(
         sessionG.levelConfig,
@@ -83,16 +74,25 @@ void main() {
 
     test("create liste des cases du chemin", () {
       final expectList = [
-        CaseModel(xValue: 0, yValue: 1, wallH: true, wallV: false),
-        CaseModel(xValue: 0, yValue: 2, wallH: false, wallV: false),
+        CaseModel(xValue: 1, yValue: 2),
+        CaseModel(xValue: 1, yValue: 1),
+        CaseModel(xValue: 1, yValue: 0),
       ];
-
+      final roadList = [
+        CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1),
+        CaseModel(xValue: 0, yValue: 1, wallH: true),
+        CaseModel(xValue: 1, yValue: 1),
+        CaseModel(xValue: 2, yValue: 1),
+        CaseModel(xValue: 2, yValue: 2),
+        CaseModel(xValue: 2, yValue: 3),
+        CaseModel(xValue: 1, yValue: 3),
+      ];
       final result = moveManageService.createListCasesTest(
-        CaseModel(xValue: 0, yValue: 2, wallH: false, wallV: false),
+        CaseModel(xValue: 1, yValue: 0),
         sessionG.levelConfig,
-        sessionG.roadList,
+        roadList,
         TypeMove.vertical,
-        1,
+        -1,
       );
 
       expect(result, expectList);
@@ -103,53 +103,35 @@ void main() {
     test("horizontal wall - handle", () {
       final result = moveManageService.handleMove(
         sessionG,
-        CaseModel(xValue: 0, yValue: 2, wallH: false, wallV: false),
+        CaseModel(xValue: 0, yValue: 2),
       );
 
-      // expect(
-      //   result.errorCase,
-      //   CaseModel(xValue: 0, yValue: 1, wallH: true, wallV: false),
-      // );
+      expect(result.errorCase, CaseModel(xValue: 0, yValue: 1, wallH: true));
       expect(result.statusCode, MoveStatusCode.wallError);
 
-      // expect(result.sessionState, sessionG);
+      expect(result.sessionState, sessionG);
     });
 
     test("vertical wall ", () {
       final result = moveManageService.handleMove(
         sessionG,
-        CaseModel(xValue: 1, yValue: 0, wallH: false, wallV: false),
+        CaseModel(xValue: 1, yValue: 0),
       );
 
-      // expect(
-      //   result.errorCase,
-      //   CaseModel(xValue: 1, yValue: 0, wallH: false, wallV: false),
-      // );
+      expect(
+        result.errorCase,
+        CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1),
+      );
       expect(result.statusCode, MoveStatusCode.wallError);
 
-      // expect(result.sessionState, sessionG);
+      expect(result.sessionState, sessionG);
     });
     test("Tag suit", () {
       final result = moveManageService.handleMove(
         sessionG,
-        CaseModel(
-          xValue: 3,
-          yValue: 0,
-          wallH: false,
-          wallV: false,
-          numberTag: 4,
-        ),
+        CaseModel(xValue: 3, yValue: 0, numberTag: 4),
       );
-      expect(
-        result.errorCase,
-        CaseModel(
-          xValue: 3,
-          yValue: 0,
-          wallH: false,
-          wallV: false,
-          numberTag: 4,
-        ),
-      );
+      expect(result.errorCase, CaseModel(xValue: 3, yValue: 0, numberTag: 4));
       expect(result.statusCode, MoveStatusCode.tagError);
 
       expect(result.sessionState, sessionG);
@@ -158,34 +140,22 @@ void main() {
       final SessionState session = SessionState(
         levelConfig: level,
         roadList: [
-          CaseModel(
-            xValue: 0,
-            yValue: 0,
-            wallH: false,
-            wallV: false,
-            numberTag: 1,
-          ),
-          CaseModel(xValue: 0, yValue: 1, wallH: false, wallV: false),
-          CaseModel(xValue: 0, yValue: 2, wallH: true, wallV: false),
-          CaseModel(xValue: 1, yValue: 2, wallH: false, wallV: false),
-          CaseModel(xValue: 2, yValue: 2, wallH: false, wallV: false),
-          CaseModel(xValue: 2, yValue: 3, wallH: false, wallV: false),
-          CaseModel(xValue: 1, yValue: 3, wallH: false, wallV: false),
+          CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1),
+          CaseModel(xValue: 0, yValue: 1, wallH: true),
+          CaseModel(xValue: 1, yValue: 1),
+          CaseModel(xValue: 2, yValue: 1),
+          CaseModel(xValue: 2, yValue: 2),
+          CaseModel(xValue: 2, yValue: 3),
+          CaseModel(xValue: 1, yValue: 3),
         ],
         roadSet: {
-          CaseModel(
-            xValue: 0,
-            yValue: 0,
-            wallH: false,
-            wallV: false,
-            numberTag: 1,
-          ),
-          CaseModel(xValue: 0, yValue: 1, wallH: false, wallV: false),
-          CaseModel(xValue: 0, yValue: 2, wallH: true, wallV: false),
-          CaseModel(xValue: 1, yValue: 2, wallH: false, wallV: false),
-          CaseModel(xValue: 2, yValue: 2, wallH: false, wallV: false),
-          CaseModel(xValue: 2, yValue: 3, wallH: false, wallV: false),
-          CaseModel(xValue: 1, yValue: 3, wallH: false, wallV: false),
+          CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1),
+          CaseModel(xValue: 0, yValue: 1, wallH: true),
+          CaseModel(xValue: 1, yValue: 1),
+          CaseModel(xValue: 2, yValue: 1),
+          CaseModel(xValue: 2, yValue: 2),
+          CaseModel(xValue: 2, yValue: 3),
+          CaseModel(xValue: 1, yValue: 3),
         },
         lastTagSave: 1,
         statutPartie: EtatGame.isPlaying,
@@ -195,64 +165,34 @@ void main() {
 
       final result = moveManageService.handleMove(
         session,
-        CaseModel(xValue: 1, yValue: 0, wallH: false, wallV: false),
+        CaseModel(xValue: 1, yValue: 0),
       );
 
-      // expect(
-      //   result.errorCase,
-      //   CaseModel(xValue: 1, yValue: 2, wallH: false, wallV: false),
-      // );
+      expect(result.errorCase!.yValue, 1);
       expect(result.statusCode, MoveStatusCode.alreadyVisitedError);
 
-      // expect(result.sessionState, session);
+      expect(result.sessionState, session);
     });
 
     test("othogonalite - ko si non horizontal ou vertical", () {
-      final SessionState session = SessionState(
-        levelConfig: level,
-        roadList: [
-          CaseModel(
-            xValue: 0,
-            yValue: 0,
-            wallH: false,
-            wallV: false,
-            numberTag: 1,
-          ),
-        ],
-        roadSet: {
-          CaseModel(
-            xValue: 0,
-            yValue: 0,
-            wallH: false,
-            wallV: false,
-            numberTag: 1,
-          ),
-        },
-        lastTagSave: 1,
-        statutPartie: EtatGame.isPlaying,
-        difficultyMode: TypeDifficulty.normal,
-        moneyData: money,
-      );
-
       final result = moveManageService.handleMove(
-        session,
-        CaseModel(xValue: 1, yValue: 1, wallH: false, wallV: false),
+        sessionG,
+        CaseModel(xValue: 1, yValue: 1),
       );
 
       expect(result.statusCode, MoveStatusCode.notOrthoError);
 
-      expect(result.sessionState, session);
+      expect(result.sessionState, sessionG);
     });
 
     test("si aucune contrainte creation nouveau model", () {
       final result = moveManageService.handleMove(
         sessionG,
-        CaseModel(xValue: 0, yValue: 1, wallH: true, wallV: false),
+        CaseModel(xValue: 0, yValue: 1, wallH: true),
       );
 
       expect(result.errorCase, null);
       expect(result.statusCode, MoveStatusCode.success);
-
       expect(result.sessionState, result.sessionState);
     });
 
@@ -260,25 +200,12 @@ void main() {
       final state = SessionState(
         levelConfig: level,
         roadList: [
-          CaseModel(
-            xValue: 0,
-            yValue: 0,
-            wallH: false,
-            wallV: false,
-            numberTag: 1,
-          ),
-
-          CaseModel(xValue: 0, yValue: 1, wallH: false, wallV: false),
+          CaseModel(xValue: 0, yValue: 0, numberTag: 1),
+          CaseModel(xValue: 0, yValue: 1),
         ],
         roadSet: {
-          CaseModel(
-            xValue: 0,
-            yValue: 0,
-            wallH: false,
-            wallV: false,
-            numberTag: 1,
-          ),
-          CaseModel(xValue: 0, yValue: 1, wallH: false, wallV: false),
+          CaseModel(xValue: 0, yValue: 0, numberTag: 1),
+          CaseModel(xValue: 0, yValue: 1),
         },
         lastTagSave: 1,
         statutPartie: EtatGame.isPlaying,
@@ -288,24 +215,8 @@ void main() {
 
       final excepStatewithoutTag = SessionState(
         levelConfig: level,
-        roadList: [
-          CaseModel(
-            xValue: 0,
-            yValue: 0,
-            wallH: false,
-            wallV: false,
-            numberTag: 1,
-          ),
-        ],
-        roadSet: {
-          CaseModel(
-            xValue: 0,
-            yValue: 0,
-            wallH: false,
-            wallV: false,
-            numberTag: 1,
-          ),
-        },
+        roadList: [CaseModel(xValue: 0, yValue: 0, numberTag: 1)],
+        roadSet: {CaseModel(xValue: 0, yValue: 0, numberTag: 1)},
         lastTagSave: 1,
         statutPartie: EtatGame.isPlaying,
         difficultyMode: TypeDifficulty.normal,
@@ -314,13 +225,7 @@ void main() {
 
       final resultWOTag = moveManageService.handleMove(
         state,
-        CaseModel(
-          xValue: 0,
-          yValue: 0,
-          wallH: false,
-          wallV: false,
-          numberTag: 1,
-        ),
+        CaseModel(xValue: 0, yValue: 0, numberTag: 1),
       );
 
       expect(resultWOTag.sessionState, excepStatewithoutTag);
@@ -330,89 +235,39 @@ void main() {
 
   group('direction verif', () {
     test('orthogonalité - si mouvemnt vertical et horizontal false', () {
-      final lastCase = CaseModel(
-        xValue: 0,
-        yValue: 0,
-        wallH: false,
-        wallV: false,
-      );
-      final newCase = CaseModel(
-        xValue: 1,
-        yValue: 1,
-        wallH: false,
-        wallV: false,
-      );
+      final lastCase = CaseModel(xValue: 0, yValue: 0);
+      final newCase = CaseModel(xValue: 1, yValue: 1);
 
       final result = moveManageService.testDirection(lastCase, newCase);
       expect(result.ortho, false);
     });
 
     test('mouvement vertical - ', () {
-      final lastCase = CaseModel(
-        xValue: 0,
-        yValue: 0,
-        wallH: false,
-        wallV: false,
-      );
-      final newCase = CaseModel(
-        xValue: 0,
-        yValue: 2,
-        wallH: false,
-        wallV: false,
-      );
+      final lastCase = CaseModel(xValue: 0, yValue: 0);
+      final newCase = CaseModel(xValue: 0, yValue: 2);
 
       final result = moveManageService.testDirection(lastCase, newCase);
       expect(result.typeMove, TypeMove.vertical);
     });
     test('mouvement horizontal - ', () {
-      final lastCase = CaseModel(
-        xValue: 0,
-        yValue: 0,
-        wallH: false,
-        wallV: false,
-      );
-      final newCase = CaseModel(
-        xValue: 1,
-        yValue: 0,
-        wallH: false,
-        wallV: false,
-      );
+      final lastCase = CaseModel(xValue: 0, yValue: 0);
+      final newCase = CaseModel(xValue: 1, yValue: 0);
 
       final result = moveManageService.testDirection(lastCase, newCase);
       expect(result.typeMove, TypeMove.horizontal);
     });
 
     test("direction - si abs ou ordoné final suppérieur retourne 1", () {
-      final lastCase = CaseModel(
-        xValue: 0,
-        yValue: 0,
-        wallH: false,
-        wallV: false,
-      );
-      final newCase = CaseModel(
-        xValue: 0,
-        yValue: 2,
-        wallH: false,
-        wallV: false,
-      );
+      final lastCase = CaseModel(xValue: 0, yValue: 0);
+      final newCase = CaseModel(xValue: 0, yValue: 2);
 
       final result = moveManageService.testDirection(lastCase, newCase);
       expect(result.direction, 1);
     });
 
     test("global datadirection", () {
-      final lastCase = CaseModel(
-        xValue: 0,
-        yValue: 0,
-        wallH: false,
-        wallV: false,
-      );
-      final newCase = CaseModel(
-        xValue: 0,
-        yValue: 2,
-        wallH: false,
-        wallV: false,
-      );
+      final lastCase = CaseModel(xValue: 0, yValue: 0);
+      final newCase = CaseModel(xValue: 0, yValue: 2);
 
       final result = moveManageService.testDirection(lastCase, newCase);
       expect(result.typeMove, TypeMove.vertical);
@@ -425,9 +280,9 @@ void main() {
   group('testwall part', () {
     test('horizontal wall', () {
       List<CaseModel> allPathCases = [
-        CaseModel(xValue: 0, yValue: 0, wallH: false, wallV: false),
-        CaseModel(xValue: 0, yValue: 1, wallH: true, wallV: false),
-        CaseModel(xValue: 0, yValue: 2, wallH: false, wallV: false),
+        CaseModel(xValue: 0, yValue: 0),
+        CaseModel(xValue: 0, yValue: 1, wallH: true),
+        CaseModel(xValue: 0, yValue: 2),
       ];
 
       final int direction = 1;
@@ -439,22 +294,13 @@ void main() {
       );
 
       expect(resultTest.$1, true);
-      expect(
-        resultTest.$2,
-        CaseModel(xValue: 0, yValue: 1, wallH: true, wallV: false),
-      );
+      expect(resultTest.$2, CaseModel(xValue: 0, yValue: 1, wallH: true));
     });
 
     test('vertical wall', () {
       List<CaseModel> allPathCases = [
-        CaseModel(
-          xValue: 0,
-          yValue: 0,
-          wallH: false,
-          wallV: true,
-          numberTag: 1,
-        ),
-        CaseModel(xValue: 1, yValue: 0, wallH: false, wallV: false),
+        CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1),
+        CaseModel(xValue: 1, yValue: 0),
       ];
 
       final int direction = 1;
@@ -467,13 +313,7 @@ void main() {
       expect(resultTest.$1, true);
       expect(
         resultTest.$2,
-        CaseModel(
-          xValue: 0,
-          yValue: 0,
-          wallH: false,
-          wallV: true,
-          numberTag: 1,
-        ),
+        CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1),
       );
     });
   });
@@ -483,13 +323,7 @@ void main() {
       final int initialMaxTag = 2;
 
       final List<CaseModel> road = [
-        CaseModel(
-          xValue: 0,
-          yValue: 1,
-          wallH: false,
-          wallV: false,
-          numberTag: 3,
-        ),
+        CaseModel(xValue: 0, yValue: 1, numberTag: 3),
       ];
 
       final result = moveManageService.testOderTag(initialMaxTag, road);
@@ -502,27 +336,12 @@ void main() {
         final int initialMaxTag = 2;
 
         final List<CaseModel> road = [
-          CaseModel(
-            xValue: 0,
-            yValue: 1,
-            wallH: false,
-            wallV: false,
-            numberTag: 5,
-          ),
+          CaseModel(xValue: 0, yValue: 1, numberTag: 5),
         ];
         final result = moveManageService.testOderTag(initialMaxTag, road);
         expect(result.goodOrder, false);
         expect(result.lastTag, 2);
-        expect(
-          result.errorCase,
-          CaseModel(
-            xValue: 0,
-            yValue: 1,
-            wallH: false,
-            wallV: false,
-            numberTag: 5,
-          ),
-        );
+        expect(result.errorCase, CaseModel(xValue: 0, yValue: 1, numberTag: 5));
       },
     );
   });
@@ -530,23 +349,18 @@ void main() {
   group('allreadypass', () {
     test('Erreur si le chemin coupe le tacé', () {
       Set<CaseModel> allCases = {
-        CaseModel(
-          xValue: 0,
-          yValue: 0,
-          wallH: false,
-          wallV: false,
-          numberTag: 1,
-        ),
-
-        CaseModel(xValue: 0, yValue: 1, wallH: true, wallV: false),
-        CaseModel(xValue: 1, yValue: 1, wallH: false, wallV: false),
-        CaseModel(xValue: 2, yValue: 1, wallH: false, wallV: false),
-        CaseModel(xValue: 2, yValue: 2, wallH: false, wallV: false),
-        CaseModel(xValue: 1, yValue: 2, wallH: false, wallV: false),
+        CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1),
+        CaseModel(xValue: 0, yValue: 1, wallH: true),
+        CaseModel(xValue: 1, yValue: 1),
+        CaseModel(xValue: 2, yValue: 1),
+        CaseModel(xValue: 2, yValue: 2),
+        CaseModel(xValue: 2, yValue: 3),
+        CaseModel(xValue: 1, yValue: 3),
       };
       List<CaseModel> newRoadList = [
-        CaseModel(xValue: 1, yValue: 1, wallH: false, wallV: false),
-        CaseModel(xValue: 1, yValue: 0, wallH: false, wallV: false),
+        CaseModel(xValue: 1, yValue: 2),
+        CaseModel(xValue: 1, yValue: 1),
+        CaseModel(xValue: 1, yValue: 0),
       ];
       final result = moveManageService.testAlreadyPass(allCases, newRoadList);
       expect(result.$1, true);

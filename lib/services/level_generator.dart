@@ -1,71 +1,89 @@
+import 'package:clean_temp/data/enum.dart';
+import 'package:clean_temp/data/levels_import/levels_import_model.dart';
 import 'package:clean_temp/models/case/case_model.dart';
+import 'package:collection/collection.dart';
 
 class LevelGenerator {
-  static ({List<CaseModel> cases, CaseModel firstTagCase, int maxTag}) generateLevelComplet(
-    dynamic leveljson,
-  ) {
-    final List<dynamic> balisesPoints =
-        leveljson['balisesPoints'] as List<dynamic>;
+  static ResultLevelGenerator generateLevelComplet(LevelsImport levelImport) {
+    final int size = levelImport.size;
 
-    final int maxTag = balisesPoints.length;
+    final List<CaseModel> listFinal = [];
 
-    final Map<String, int> balisesMap = {
-      for (final entry in balisesPoints.asMap().entries)
-        '${entry.value[0]},${entry.value[1]}': entry.key + 1,
+    // vérifie que sur le niveau la liste des tag est complete sans doublons
+    if (levelImport.tagsList.isEmpty ||
+        levelImport.tagsList.length > levelImport.tagsList.toSet().length) {
+      return ResultLevelGenerator(
+        success: false,
+        codeResult: CodeLevelGenerator.countTagKo,
+      );
+    }
+
+    final Map<(int, int), int> mapTags = {
+      for (int i = 0; i < levelImport.tagsList.length; i++)
+        levelImport.tagsList[i]: i + 1,
     };
 
-    final List<dynamic> wallH = leveljson['wallH'] as List<dynamic>;
-    final Set<String> mursHSet = (wallH as List<List<int>>).map((coords) {
-      return '${coords[0]},${coords[1]}';
-    }).toSet();
+    final lastTag = levelImport.tagsList.length;
+    // boucle de creations des cases
 
-    final List<dynamic> wallV = leveljson['wallV'] as List<dynamic>;
+    for (int y = 0; y < size; y++) {
+      for (int x = 0; x < size; x++) {
+        bool? wallH;
+        bool? wallV;
 
-    final Set<String> mursVSet = (wallV as List<List<int>>).map((coords) {
-      return '${coords[0]},${coords[1]}';
-    }).toSet();
+        final cle = (x, y);
 
-    List<CaseModel> casesFinales = [];
-    int tailleGrille = 6;
+        wallH = levelImport.wallH.isNotEmpty && levelImport.wallH.contains(cle)
+            ? true
+            : null;
 
-    // --- Démarrage de la Double Boucle ---
-    for (int y = 0; y < tailleGrille; y++) {
-      for (int x = 0; x < tailleGrille; x++) {
-        String cle = '$x,$y';
+        wallV = levelImport.wallV.isNotEmpty && levelImport.wallV.contains(cle)
+            ? true
+            : null;
 
-        var wallH = false;
-        var wallV = false;
-        int? balise;
-
-        if (mursHSet.contains(cle)) {
-          wallH = true;
-        }
-
-        if (mursVSet.contains(cle)) {
-          wallV = true;
-        }
-
-        if (balisesMap.containsKey(cle)) {
-          // Récupérer le numéro de la balise
-          balise = balisesMap[cle];
-        }
-
-        casesFinales.add(
+        listFinal.add(
           CaseModel(
             xValue: x,
             yValue: y,
             wallH: wallH,
             wallV: wallV,
-            numberTag: balise,
+            numberTag: mapTags[cle],
           ),
         );
       }
     }
-    final CaseModel firstCase = casesFinales.firstWhere(
-      (c) => c.numberTag == 1,
-      orElse: () => throw Exception("Balise de départ (Tag 1) non trouvée."),
-    );
 
-    return (cases: casesFinales, firstTagCase: firstCase, maxTag: maxTag);
+    final firstCase = listFinal.firstWhereOrNull((c) => c.numberTag == 1);
+
+    if (firstCase == null) {
+      return ResultLevelGenerator(
+        success: false,
+        codeResult: CodeLevelGenerator.countTagKo,
+      );
+    }
+
+    return ResultLevelGenerator(
+      success: true,
+      codeResult: CodeLevelGenerator.success,
+      cases: listFinal,
+      firstTagCase: firstCase,
+      maxTag: lastTag,
+    );
   }
+}
+
+class ResultLevelGenerator {
+  final bool success;
+  final CodeLevelGenerator codeResult;
+  final List<CaseModel>? cases;
+  final CaseModel? firstTagCase;
+  final int? maxTag;
+
+  ResultLevelGenerator({
+    required this.success,
+    required this.codeResult,
+    this.cases,
+    this.firstTagCase,
+    this.maxTag,
+  });
 }

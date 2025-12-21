@@ -19,8 +19,8 @@ class CaseModelAdapter extends TypeAdapter<CaseModel> {
     return CaseModel(
       xValue: fields[0] as int,
       yValue: fields[1] as int,
-      wallH: fields[2] as bool,
-      wallV: fields[3] as bool,
+      wallH: fields[2] as bool?,
+      wallV: fields[3] as bool?,
       numberTag: fields[4] as int?,
     );
   }
