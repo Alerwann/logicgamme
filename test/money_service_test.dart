@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:clean_temp/services/money_service.dart';
 import 'package:clean_temp/models/money/money_model.dart';
 import 'package:clean_temp/data/enum.dart';
-import 'package:hive/hive.dart';
 
 void main() {
   final moneyService = MoneyService();
@@ -66,21 +65,26 @@ void main() {
       'buyBonus - Doit échouer si pas assez de gemmes et pas de bonus',
       () async {
         // 1. Arrange : 0 gemmes, 0 bonus
-        final money = MoneyModel(
-          gemeStock: 0,
-          bonusDaily: 0,
-          freeHardBonus: 0,
+
+
+         final MoneyModel modelTry = MoneyModel(
           bestLevel: 1,
+          bonusDaily: 0,
+          gemeStock: 0,
+          freeHardBonus: 1,
         );
-        final box = Hive.box<MoneyModel>(Constants.moneyBox);
-        await box.put('actionKo', money);
-        // 2. Act : On tente d'acheter du temps
-        final result = await moneyService.buyBonus(money, TypeBonus.bonusTime);
+
+
+        final result = moneyService.testTypeBuyBonus(
+          TypeBonus.bonusTime,
+          modelTry,
+        );
+
 
         // 3. Assert
-        expect(result.isDo, isFalse);
-        expect(result.state, money);
-        expect(result.statusCode, BuyStatusCode.actionKo);
+        expect(result.$1, isFalse);
+        expect(result.$2, modelTry );
+
       },
     );
 

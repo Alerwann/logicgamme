@@ -72,7 +72,7 @@ class GameManager extends StateNotifier<SessionState> {
 
   void _stratWaitingDifficulty() {
     _waitDiff = Timer(
-      Duration(seconds: Constants.durationWaitingDif),
+      Duration(seconds: Constants.DURATION_PREVIEW_LEVEL),
       () => state = state.copyWith(statutPartie: EtatGame.chooseDifficulty),
     );
   }
@@ -143,7 +143,7 @@ class GameManager extends StateNotifier<SessionState> {
 
   Future<void> _saveWinGame() async {
     try {
-     ResultActionBonus returnState = await _moneyService.handleWinGame(
+      ResultActionBonus returnState = await _moneyService.handleWinGame(
         levelId: state.levelConfig.levelId,
         difficultyMode: state.difficultyMode,
         moneyState: state.moneyData,

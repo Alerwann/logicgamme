@@ -31,4 +31,4 @@ enum TypeDifficulty { normal, hard }
 
 enum BuyStatusCode { success, saveKO, actionKo }
 
-enum CodeLevelGenerator { success,successLoadAll, countLevelKo, countTagKo , levelNotExist}
+enum CodeLevelGenerator { success, countLevelKo, countTagKo , levelNotExist}
