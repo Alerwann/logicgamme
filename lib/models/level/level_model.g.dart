@@ -19,9 +19,9 @@ class LevelModelAdapter extends TypeAdapter<LevelModel> {
     return LevelModel(
       levelId: fields[0] as int,
       cases: (fields[1] as List).cast<CaseModel>(),
-      bestRecordNormalSeconds: fields[2] as int,
-      firstCase: fields[3] as CaseModel,
-      maxTag: fields[4] as int,
+      firstCase: fields[2] as CaseModel,
+      maxTag: fields[3] as int,
+      bestRecordNormalSeconds: fields[4] as int,
     );
   }
 
@@ -34,11 +34,11 @@ class LevelModelAdapter extends TypeAdapter<LevelModel> {
       ..writeByte(1)
       ..write(obj.cases)
       ..writeByte(2)
-      ..write(obj.bestRecordNormalSeconds)
-      ..writeByte(3)
       ..write(obj.firstCase)
+      ..writeByte(3)
+      ..write(obj.maxTag)
       ..writeByte(4)
-      ..write(obj.maxTag);
+      ..write(obj.bestRecordNormalSeconds);
   }
 
   @override

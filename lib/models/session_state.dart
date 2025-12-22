@@ -4,15 +4,35 @@ import 'package:clean_temp/models/level/level_model.dart';
 import 'package:clean_temp/models/money/money_model.dart';
 import 'package:flutter/foundation.dart';
 
+/// Réprésente l'état de la partie à un instant t
+///
+/// L'état est généré quand le joueur lance la partie et s'arrête une fois l'affichage terminé
+/// Stockage non persistant d'où la non utilisation de Hive
+///
+
 class SessionState {
+  /// Model du niveau joué
   final LevelModel levelConfig;
+
+  /// List des cases qui ont été parcouru par le joueur
+  /// Est initialisé avec [firstCase] du [levelConfig]
   final List<CaseModel> roadList;
+
+  /// Set des cases qui ont été parcouru par le joueur
+  /// le set doit avoir les mêmes cases que la List
+  /// Il est nécessaire pour facilité la recherche d'une case dans celle parcouru
   final Set<CaseModel> roadSet;
+
+  /// Initialisé à 1, augmente à chaque fois que le jour valide la balise suivante
   final int lastTagSave;
 
+  /// Définit les état de la partie (définition précise de chaque état dans l'énum)
   final EtatGame statutPartie;
+
+  /// Définit si la partie est en mode Normal ou Hard
   final TypeDifficulty difficultyMode;
 
+  /// Définit l'état des monnaies
   final MoneyModel moneyData;
 
   SessionState({
@@ -25,6 +45,7 @@ class SessionState {
     required this.moneyData,
   });
 
+  ///Utilise la copy pour te pas casser l'immuabilité du modèle
   SessionState copyWith({
     LevelModel? levelConfig,
     List<CaseModel>? roadList,
@@ -45,6 +66,10 @@ class SessionState {
     );
   }
 
+  /// Compare 2 [SessionState] par leur valeurs
+  /// retourne vrai si le niveau, les list et set du chemin, le dernier tag validé, le statut de la partie, la difficulté et l'état des monaies sont identiques
+  ///
+  ///
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -59,12 +84,12 @@ class SessionState {
           moneyData == other.moneyData;
 
   @override
-  int get hashCode =>
-     
-      levelConfig.hashCode ^
-      Object.hashAll(roadList) ^
-      Object.hashAll(roadSet) ^
-      statutPartie.hashCode ^
-      difficultyMode.hashCode ^
-      moneyData.hashCode;
+  int get hashCode => Object.hash(
+    levelConfig,
+    Object.hashAll(roadList),
+    Object.hashAll(roadSet),
+    statutPartie,
+    difficultyMode,
+    moneyData,
+  );
 }

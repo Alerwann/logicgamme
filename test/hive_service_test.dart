@@ -10,22 +10,21 @@ void main() {
   late Directory tempDir;
 
   setUp(() async {
-    // 1. Créer un dossier temporaire unique pour ce test
+ 
     tempDir = await Directory.systemTemp.createTemp();
     Hive.init(tempDir.path);
 
-    // 2. Enregistrer tous les Adapters nécessaires
+
     if (!Hive.isAdapterRegistered(3)) Hive.registerAdapter(LevelModelAdapter());
     if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(CaseModelAdapter());
 
-    // 3. Ouvrir la box avant de créer le service
     await Hive.openBox<LevelModel>('levelsBox');
 
     hiveService = HiveService();
   });
 
   tearDown(() async {
-    // 4. Nettoyer après le test pour ne pas polluer les autres
+
     await Hive.close();
     if (tempDir.existsSync()) {
       await tempDir.delete(recursive: true);

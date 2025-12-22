@@ -15,6 +15,13 @@ import 'package:clean_temp/services/move_manager_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+
+
+/// Service central de la gestion globale de la partie
+/// 
+/// Ce service est appelé depuis l'ui quand le joueur lance la partie
+/// Il répartie les tâches et fait les retours par changement d'état ou via le provider messenger
+/// 
 class GameManager extends StateNotifier<SessionState> {
   final Ref _ref;
 
@@ -31,7 +38,7 @@ class GameManager extends StateNotifier<SessionState> {
 
   final MoveManagerService _moveManageService;
 
-  //initialisation
+  ///initialisation de la classe
   GameManager(
     LevelModel levelPlaying,
     this._moneyService,
@@ -53,6 +60,7 @@ class GameManager extends StateNotifier<SessionState> {
     }
   }
 
+/// création de l'état initial de Session State
   static SessionState _calculerEtatInitial(
     LevelModel niveau,
     MoneyModel money,
@@ -68,14 +76,23 @@ class GameManager extends StateNotifier<SessionState> {
     );
   }
 
-  // gestion des timers
 
+/// Mise en place du timer de prévisualisation de la grille
+/// Il est lancé uniquement si le joueur à les moyen d'acheter le changement de difficulté
+/// Une fois terminé passe en etat chooseDifficulty pour afficher le popup de choix
   void _stratWaitingDifficulty() {
     _waitDiff = Timer(
       Duration(seconds: Constants.DURATION_PREVIEW_LEVEL),
       () => state = state.copyWith(statutPartie: EtatGame.chooseDifficulty),
     );
   }
+/// Lancement du timer de la partie
+/// Il demarre au premier toucher 
+/// Quand le compteur est à 0 :
+///   - il est arrété
+///   - passe en waitAddtime qui vérifie
+///   - si assez pour acheté passe l'état en chooseAddtime pour déclancé un popup de choix
+///   - si pas assez passe l'état en loose pour signaler la perte de la partie
 
   void _startTimer(int sDurationLevel) {
     _resultTimer = sDurationLevel;
@@ -100,19 +117,24 @@ class GameManager extends StateNotifier<SessionState> {
       }
     });
   }
-
+/// fonction de mise en pause du timer sur demande du joueur
+/// 
+/// passe l'état de la partie en pause
   void pauseTime() {
     _timer?.cancel();
     state = state.copyWith(statutPartie: EtatGame.pause);
   }
 
+/// Permet de redémarrer le timer après une pause
+/// 
+/// repasse la partie en isPalaying
   void resumeTime() {
     if (state.statutPartie == EtatGame.pause) {
       _startTimer(_resultTimer);
       state = state.copyWith(statutPartie: EtatGame.isPlaying);
     }
   }
-
+/// Permet le nettoyage des contrôleurs
   @override
   void dispose() {
     _timer?.cancel();
@@ -121,6 +143,9 @@ class GameManager extends StateNotifier<SessionState> {
   }
 
   //gestion des scores de fin de partie
+
+  /// Après vérification si le record est battut, envoie de la demande de sauvegarde
+  /// 
   Future<void> _saveRecord(LevelModel level) async {
     if (level.bestRecordNormalSeconds > _tempsEcoule.inSeconds) {
       try {
@@ -140,7 +165,8 @@ class GameManager extends StateNotifier<SessionState> {
           "Bravo ! Record non battu (actuel: ${level.bestRecordNormalSeconds}s)";
     }
   }
-
+/// Si la partie est gagnée envoie la maj des information de [MoneyService]
+/// 
   Future<void> _saveWinGame() async {
     try {
       ResultActionBonus returnState = await _moneyService.handleWinGame(
@@ -165,6 +191,11 @@ class GameManager extends StateNotifier<SessionState> {
     }
   }
 
+  /// Si le joueur arrive à la dernière balise vérification du gain de la partie
+  /// 
+  /// Si tout le tableau est rempli les sauvegardes sont appelées et passage en Win
+  /// Sinon retour comme quoi le tableau n'est pas remplis
+
   void _checkEndGame() {
     bool isGridCompleted =
         state.roadSet.length == state.levelConfig.cases.length;
@@ -183,6 +214,11 @@ class GameManager extends StateNotifier<SessionState> {
   }
 
   // Gestion de la partie et ses mouvements
+
+  /// A chaque mouvement envoie les informations à movemanager et affiche le message correspondant
+  /// 
+  /// Pour que le joueur puisse jouer l'état doit être [isPlaying]
+  /// Ordone le lancement timer si c'est le premier mouvement
   void handleMove(CaseModel newCase) {
     int sDurationLevel;
     switch (state.difficultyMode) {
@@ -251,6 +287,14 @@ class GameManager extends StateNotifier<SessionState> {
 
   //Fonctions appelé par la validation des popup
 
+/// Fonction appellé par le popup de choix de difficulté
+/// 
+/// paramètre [chooseHard] est true si le joueur change le niveau false sinon
+/// Si le joueur refuse le changelment le statut de la partie passe en isplayin directement
+/// Modification de l'état de la partie si l'achat et la sauvegarde à réussi  et envoie du message à afficher
+/// Si echec matien du niveau à normal 
+/// 
+/// Passage à isPlaying en fin quoi qu'il arrive
   Future<void> difficultyChoose(bool chooseHard) async {
     if (!chooseHard) {
       state = state.copyWith(statutPartie: EtatGame.isPlaying);
@@ -282,9 +326,22 @@ class GameManager extends StateNotifier<SessionState> {
     }
   }
 
+
+/// Fonction appellé par le popup de choix de difficulté
+  ///
+  /// paramètre [chooseTime] est true si le joueur change le niveau false sinon
+  /// Si le joueur refuse l'augmentation de tamps le statut de la partie passe en loose directement
+  /// 
+  /// Modification de l'état de la partie si l'achat et la sauvegarde ont réussi  
+  ///   - mise à jour de l'état de la partie -> la difficulté en normal, monnaie à jour, statut isPlaying 
+  ///   - lancement du timer avec 30s supplémentaire
+  /// 
+  /// Si echec passage en état loose et envoie du message d'information
+  ///
+  /// 
   Future<void> addTimechoose(bool chooseTime) async {
     if (!chooseTime) {
-      state = state.copyWith(statutPartie: EtatGame.isPlaying);
+      state = state.copyWith(statutPartie: EtatGame.loose);
     } else {
       try {
         final resultBuy = await _moneyService.buyBonus(
@@ -312,6 +369,9 @@ class GameManager extends StateNotifier<SessionState> {
   }
 }
 
+
+/// Définission du provider de gameManager
+/// 
 final gameManagerProvider =
     StateNotifierProvider.family<GameManager, SessionState, LevelModel>((
       ref,

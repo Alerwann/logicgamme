@@ -1,5 +1,5 @@
 import 'package:clean_temp/data/levels_import/levels_import_model.dart';
-
+/// Classe qui répertorie l'ensemble des niveaux sous forme de liste
 class AllLevel {
   static final List<LevelsImport> _defaultList = [
     LevelsImport(
