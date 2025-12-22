@@ -21,14 +21,15 @@ class LevelModelAdapter extends TypeAdapter<LevelModel> {
       cases: (fields[1] as List).cast<CaseModel>(),
       firstCase: fields[2] as CaseModel,
       maxTag: fields[3] as int,
-      bestRecordNormalSeconds: fields[4] as int,
+      size: fields[4] as int,
+      bestRecordNormalSeconds: fields[5] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, LevelModel obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.levelId)
       ..writeByte(1)
@@ -38,6 +39,8 @@ class LevelModelAdapter extends TypeAdapter<LevelModel> {
       ..writeByte(3)
       ..write(obj.maxTag)
       ..writeByte(4)
+      ..write(obj.size)
+      ..writeByte(5)
       ..write(obj.bestRecordNormalSeconds);
   }
 

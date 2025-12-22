@@ -22,11 +22,13 @@ class LevelModel extends HiveObject {
   CaseModel firstCase;
   @HiveField(3)
   int maxTag;
+  @HiveField(4)
+  int size;
 
   /// Quand le joueur à gagné un niveau son temps est enregistré
   /// Il peut ainsi le rejouer pour l'améliorer et battre son record
 
-  @HiveField(4)
+  @HiveField(5)
   late int bestRecordNormalSeconds;
 
   LevelModel({
@@ -34,6 +36,7 @@ class LevelModel extends HiveObject {
     required this.cases,
     required this.firstCase,
     required this.maxTag,
+    required this.size,
     this.bestRecordNormalSeconds = 99999,
   });
 
@@ -49,7 +52,8 @@ class LevelModel extends HiveObject {
           listEquals(cases, other.cases) &&
           bestRecordNormalSeconds == other.bestRecordNormalSeconds &&
           firstCase == other.firstCase &&
-          maxTag == other.maxTag;
+          maxTag == other.maxTag &&
+          size == other.size;
 
   /// Génère une clé de hachage basée sur l'ensemble des propriétés de la case.
   @override
@@ -59,5 +63,6 @@ class LevelModel extends HiveObject {
     bestRecordNormalSeconds,
     firstCase,
     maxTag,
+    size
   );
 }

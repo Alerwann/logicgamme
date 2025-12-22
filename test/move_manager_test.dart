@@ -40,6 +40,7 @@ void main() {
       numberTag: 1,
     ),
     maxTag: 4,
+    size: 4
   );
 
   final MoneyModel money = MoneyModel(

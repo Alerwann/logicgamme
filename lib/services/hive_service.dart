@@ -49,6 +49,7 @@ class HiveService {
           cases: casesFinales,
           firstCase: firstCase,
           maxTag: maxTag,
+          size:  result.size!,
         );
         levelsBox.put(i, value);
       } else if (!result.success) {
@@ -166,6 +167,7 @@ class HiveService {
       cases: listFinal,
       firstTagCase: firstCase,
       maxTag: lastTag,
+      size: size,
     );
   }
 }
@@ -188,11 +190,16 @@ class ResultLevelGenerator {
   /// Si génété retourne le tag maximal
   final int? maxTag;
 
+  /// Si généré retourne la taille
+
+  final int? size;
+
   ResultLevelGenerator({
     required this.success,
     required this.codeResult,
     this.cases,
     this.firstTagCase,
     this.maxTag,
+    this.size
   });
 }
