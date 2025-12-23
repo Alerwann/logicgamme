@@ -1,5 +1,6 @@
 import 'package:clean_temp/data/enum.dart';
 import 'package:clean_temp/models/case/case_model.dart';
+import 'package:clean_temp/models/data_for_painting.dart';
 import 'package:clean_temp/models/level/level_model.dart';
 import 'package:clean_temp/models/session_state.dart';
 
@@ -70,6 +71,7 @@ class MoveManagerService {
       typeMove,
       direction,
     );
+
     /// si liste crée inférieur à la liste espérée -> problème de chargement
     if (casesList.length != expectedLength) {
       return MoveResult(
@@ -77,6 +79,7 @@ class MoveManagerService {
         statusCode: MoveStatusCode.internalError,
       );
     }
+
     /// vérification que le nouveau chemin ne coupe pas l'ancien
 
     final resultAllreadyPass = testAlreadyPass(state.roadSet, casesList);
@@ -119,6 +122,11 @@ class MoveManagerService {
     }
 
     SessionState newState = state.copyWith(
+      statutPartie: EtatGame.isDrawing,
+      dataPainting: CoordForPainting(
+        startCoord: (lastCase.xValue, lastCase.yValue),
+        endCoord: (newCase.xValue, newCase.yValue),
+      ),
       roadList: [...state.roadList, ...casesList],
       roadSet: {...state.roadSet, ...casesList},
       lastTagSave: currentTagIndex,
@@ -137,14 +145,14 @@ class MoveManagerService {
     );
   }
 
-/// Fonction permettant d'obtenir le [CaseModel] d'une case à partir des coordonées
-/// 
-/// Paramètre :
-/// [level] L'ensemble des informations du niveau joué
-/// [targetX] L'abscisse de la case
-/// [targetY] l'ordonnée de la case
-/// 
-/// Retourne la case si elle a été trouvée
+  /// Fonction permettant d'obtenir le [CaseModel] d'une case à partir des coordonées
+  ///
+  /// Paramètre :
+  /// [level] L'ensemble des informations du niveau joué
+  /// [targetX] L'abscisse de la case
+  /// [targetY] l'ordonnée de la case
+  ///
+  /// Retourne la case si elle a été trouvée
   CaseModel? getCaseByCoordinates(LevelModel level, int targetX, int targetY) {
     try {
       return level.cases.firstWhere(
@@ -156,16 +164,16 @@ class MoveManagerService {
     }
   }
 
-/// Création de la liste du nouveau chemin
-/// 
-/// Paramètres :
-/// [newCase] les données de la nouvelle case
-/// [level] les données du niveau
-/// [road] La liste du chemin pour savoir ou s'est arrêté le joueur avant
-/// [typeMove] savoir si le mouvement est vertical ou horizontal
-/// [direction] si gauche droite ou haut bas vaut 1 sinon vaut -1
-/// 
-/// retourne une liste de case
+  /// Création de la liste du nouveau chemin
+  ///
+  /// Paramètres :
+  /// [newCase] les données de la nouvelle case
+  /// [level] les données du niveau
+  /// [road] La liste du chemin pour savoir ou s'est arrêté le joueur avant
+  /// [typeMove] savoir si le mouvement est vertical ou horizontal
+  /// [direction] si gauche droite ou haut bas vaut 1 sinon vaut -1
+  ///
+  /// retourne une liste de case
   List<CaseModel> createListCasesTest(
     CaseModel newCase,
     LevelModel level,
@@ -208,21 +216,21 @@ class MoveManagerService {
     return caseToTest;
   }
 
-/// Fonction qui vérifie la présence de mur bloquant
-/// 
-/// Un mur est considérer bloquant s'il est traversé par le chemin
-/// 
-/// Paramètre:
-/// [allPathCases] ensemble des cases du chemin y compris la dernière case de roadList car peut avoir un mur bloquant
-/// [directionMove] sens du mouvement
-/// [typeMove] définit si mouvement vertical ou horizontal
-/// 
-/// La première case est ignorée dans le cas ou direction est -1 car ne bloque jamais
-/// La Dernière case est ignorée dans le cas ou la direction est 1
-/// 
-/// Retourne False et la dernière case de la liste si aucun mur
-/// Retourne True et la première case comprenant le mur si le mur est bloquant
-/// 
+  /// Fonction qui vérifie la présence de mur bloquant
+  ///
+  /// Un mur est considérer bloquant s'il est traversé par le chemin
+  ///
+  /// Paramètre:
+  /// [allPathCases] ensemble des cases du chemin y compris la dernière case de roadList car peut avoir un mur bloquant
+  /// [directionMove] sens du mouvement
+  /// [typeMove] définit si mouvement vertical ou horizontal
+  ///
+  /// La première case est ignorée dans le cas ou direction est -1 car ne bloque jamais
+  /// La Dernière case est ignorée dans le cas ou la direction est 1
+  ///
+  /// Retourne False et la dernière case de la liste si aucun mur
+  /// Retourne True et la première case comprenant le mur si le mur est bloquant
+  ///
   (bool, CaseModel) testWall(
     List<CaseModel> allPathCases,
     int directionMove,
@@ -251,14 +259,14 @@ class MoveManagerService {
     return (false, allPathCases.last);
   }
 
-/// Fonction qui teste si le nouveau chemin coupe l'ancien
-/// 
-/// Paramètre :
-/// [allCases] Le chemin déjà parcouru
-/// [newCasesList] Le chemin qui va être parcouru
-/// 
-/// Retourne True et la case de la première intersection si les chemins se coupent
-/// Retourne False et la dernière case si aucune intersection
+  /// Fonction qui teste si le nouveau chemin coupe l'ancien
+  ///
+  /// Paramètre :
+  /// [allCases] Le chemin déjà parcouru
+  /// [newCasesList] Le chemin qui va être parcouru
+  ///
+  /// Retourne True et la case de la première intersection si les chemins se coupent
+  /// Retourne False et la dernière case si aucune intersection
   (bool, CaseModel) testAlreadyPass(
     Set<CaseModel> allCases,
     List<CaseModel> newCasesList,
@@ -273,11 +281,11 @@ class MoveManagerService {
   }
 
   /// Fonction qui teste la présence de balise et valide si elles suivent l'ordre
-  /// 
+  ///
   /// Paramètre :
   /// [lastTagSave] le numéro de la dernière balise validée
   /// [newRoad] List des case qui vont etre parcourues par le nouveau chemin
-  /// 
+  ///
   /// Retourne true, et le dernier tag à enregistrer si valide
   /// Retourne false, [lastTagSave] pour qu'il n'y ai pas de changement et la case qui à posé problème
 
@@ -300,16 +308,16 @@ class MoveManagerService {
     return ResultOrderTag(goodOrder: true, lastTag: temporyTag);
   }
 
-/// fonction qui vérifie l'orthogonalité et retourne le sens et la direction du mouvement
-/// 
-/// [lastCase] Dernière case valide du chemin déjà parcouru
-/// [newCase] Case choisi par le joueur
-/// 
-/// Retourne un bool qui est false si le chemin est en diagonale et true sinon
-/// Si l'orthogonalité est vérifiée retourne
-///  - la longueur du chemin
-///  - s'il est horizontal ou vertical
-///  - la direction (1 si gauche-> Droite ou haut-> bas sinon -1 ) 
+  /// fonction qui vérifie l'orthogonalité et retourne le sens et la direction du mouvement
+  ///
+  /// [lastCase] Dernière case valide du chemin déjà parcouru
+  /// [newCase] Case choisi par le joueur
+  ///
+  /// Retourne un bool qui est false si le chemin est en diagonale et true sinon
+  /// Si l'orthogonalité est vérifiée retourne
+  ///  - la longueur du chemin
+  ///  - s'il est horizontal ou vertical
+  ///  - la direction (1 si gauche-> Droite ou haut-> bas sinon -1 )
 
   ResultDirection testDirection(CaseModel lastCase, CaseModel newCase) {
     int delta;
@@ -342,13 +350,16 @@ class MoveManagerService {
     );
   }
 }
+
 /// Retour normalisé pour les tag
 class ResultOrderTag {
   /// l'ordre est repecté -> true sinon false
   final bool goodOrder;
+
   /// la valeur du dernier tag valide
   final int lastTag;
-  /// le model de la case qui a causé l'erreur 
+
+  /// le model de la case qui a causé l'erreur
   final CaseModel? errorCase;
 
   ResultOrderTag({
@@ -357,14 +368,18 @@ class ResultOrderTag {
     this.errorCase,
   });
 }
+
 /// Retour normalisé pour la direction
 class ResultDirection {
   /// vrai si orthogonal sinon faux
   final bool ortho;
+
   /// Si ortho la longueur de la route
   final int? lengthRoad;
+
   /// si ortho la direction représenté par 1 ou -1
   final int? direction;
+
   /// Si le mouvement est vertical ou horizontal
   final TypeMove? typeMove;
 
@@ -381,8 +396,10 @@ class ResultDirection {
 class MoveResult {
   /// Détail l'erreur ou le succès (cf enum pour plus d'info)
   final MoveStatusCode statusCode;
+
   /// Retourne l'état modifier si pas d'erreur sinon l'état original
   final SessionState sessionState;
+
   /// Retourne si nécessaire la casse qui a causé l'erreur
   final CaseModel? errorCase;
 

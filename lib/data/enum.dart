@@ -19,6 +19,8 @@ enum EtatGame {
   chooseDifficulty,
     /// En attente de savoir si le joueur veut ajouter du temps
   chooseAddTime,
+  /// En attente de la fin du dessin de la fin du tracé
+  isDrawing,
 }
 
 enum MoveStatusCode {

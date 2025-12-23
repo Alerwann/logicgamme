@@ -1,5 +1,6 @@
 import 'package:clean_temp/data/enum.dart';
 import 'package:clean_temp/models/case/case_model.dart';
+import 'package:clean_temp/models/data_for_painting.dart';
 import 'package:clean_temp/models/level/level_model.dart';
 import 'package:clean_temp/models/money/money_model.dart';
 import 'package:flutter/foundation.dart';
@@ -35,6 +36,9 @@ class SessionState {
   /// Définit l'état des monnaies
   final MoneyModel moneyData;
 
+  /// Les offsets pour la création du dessin
+  final CoordForPainting? dataPainting;
+
   SessionState({
     required this.levelConfig,
     required this.roadList,
@@ -43,6 +47,7 @@ class SessionState {
     required this.statutPartie,
     required this.difficultyMode,
     required this.moneyData,
+    this.dataPainting
   });
 
   ///Utilise la copy pour te pas casser l'immuabilité du modèle
@@ -54,6 +59,7 @@ class SessionState {
     EtatGame? statutPartie,
     TypeDifficulty? difficultyMode,
     MoneyModel? moneyData,
+    CoordForPainting? dataPainting,
   }) {
     return SessionState(
       levelConfig: levelConfig ?? this.levelConfig,
@@ -63,6 +69,7 @@ class SessionState {
       statutPartie: statutPartie ?? this.statutPartie,
       difficultyMode: difficultyMode ?? this.difficultyMode,
       moneyData: moneyData ?? this.moneyData,
+      dataPainting: dataPainting 
     );
   }
 
@@ -81,7 +88,8 @@ class SessionState {
           lastTagSave == other.lastTagSave &&
           statutPartie == other.statutPartie &&
           difficultyMode == other.difficultyMode &&
-          moneyData == other.moneyData;
+          moneyData == other.moneyData &&
+          dataPainting == other.dataPainting;
 
   @override
   int get hashCode => Object.hash(
@@ -91,5 +99,6 @@ class SessionState {
     statutPartie,
     difficultyMode,
     moneyData,
+    dataPainting,
   );
 }

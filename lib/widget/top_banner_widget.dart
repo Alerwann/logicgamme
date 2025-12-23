@@ -1,5 +1,10 @@
 import 'package:flutter/widgets.dart';
 
-Text TopBannerWidget() {
-  return Text('topbanner ');
+class TopBannerWidget extends StatelessWidget {
+  const TopBannerWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
 }

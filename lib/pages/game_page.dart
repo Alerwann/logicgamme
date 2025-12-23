@@ -1,7 +1,7 @@
 import 'package:clean_temp/models/level/level_model.dart';
-import 'package:clean_temp/services/game_manager.dart';
+// import 'package:clean_temp/services/game_manager.dart';
 import 'package:clean_temp/widget/case_widget.dart';
-import 'package:clean_temp/widget/game_grid_backgroung.dart';
+// import 'package:clean_temp/widget/game_grid_backgroung.dart';
 import 'package:clean_temp/widget/top_banner_widget.dart';
 import 'package:clean_temp/widget/bottom_tools_widget.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +14,7 @@ class GamePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // On écoute le manager pour reconstruire l'UI à chaque mouvement
-    final session = ref.watch(gameManagerProvider(level));
+    // final session = ref.watch(gameManagerProvider(level));
 
     return Scaffold(
       body: Column(

@@ -5,6 +5,8 @@ class Constants {
   static const String moneyBox = 'moneyBox';
 
   static const int DURATION_PREVIEW_LEVEL = 10;
+  static const int DURATION_DRAWING_MS = 500;
+
 
   //MODE NORMAL
 

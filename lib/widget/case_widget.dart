@@ -40,7 +40,7 @@ class _CaseWidgetState extends ConsumerState<CaseWidget> {
       itemCount: widget.level.cases.length,
       itemBuilder: (context, index) {
         final levelCaseData = widget.level.cases[index];
-        final BoxDecoration deco = decorationBox(levelCaseData);
+  
 
         return GestureDetector(
           onTap: () => ref

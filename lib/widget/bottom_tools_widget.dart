@@ -1,5 +1,10 @@
 import 'package:flutter/widgets.dart';
 
-Text BottomToolsWidget() {
-  return Text('bottom ');
+class BottomToolsWidget extends StatelessWidget {
+  const BottomToolsWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Placeholder();
+  }
 }
