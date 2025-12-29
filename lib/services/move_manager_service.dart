@@ -120,9 +120,9 @@ class MoveManagerService {
         errorCase: resultTestWall.$2,
       );
     }
-
+    print("coordonnée du début : (${lastCase.xValue}, ${lastCase.yValue})");
+    print("coordonnée de fin : (${newCase.xValue}, ${newCase.yValue})");
     SessionState newState = state.copyWith(
-   
       dataPainting: CoordForPainting(
         startCoord: (lastCase.xValue, lastCase.yValue),
         endCoord: (newCase.xValue, newCase.yValue),
@@ -138,7 +138,9 @@ class MoveManagerService {
         statusCode: MoveStatusCode.successlastTagCheck,
       );
     }
-
+    print(
+      "🔍❓ datapainting du service : ${newState.dataPainting!.endCoord.$2}",
+    );
     return MoveResult(
       sessionState: newState,
       statusCode: MoveStatusCode.success,

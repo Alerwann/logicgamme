@@ -34,7 +34,8 @@ class MoneyModel extends HiveObject {
       bestLevel: 0,
       bonusDaily: 3,
       gemeStock: 0,
-      freeHardBonus: 1,
+      freeHardBonus: 0,
+      // freeHardBonus: 1,
     );
   }
 ///Utilise la copy pour te pas casser l'immuabilité du modèle

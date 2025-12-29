@@ -16,32 +16,26 @@ class _HomeBottomBarState extends State<HomeBottomBar> {
     levelId: 1,
     cases: [
       CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1),
-      CaseModel(xValue: 0, yValue: 1, wallH: true),
-      CaseModel(xValue: 0, yValue: 2),
-      CaseModel(xValue: 0, yValue: 3),
-
       CaseModel(xValue: 1, yValue: 0),
-      CaseModel(xValue: 1, yValue: 1),
-      CaseModel(xValue: 1, yValue: 2),
-      CaseModel(xValue: 1, yValue: 3),
-
-      CaseModel(xValue: 2, yValue: 0, numberTag: 2),
-      CaseModel(xValue: 2, yValue: 1),
-      CaseModel(xValue: 2, yValue: 2),
-      CaseModel(xValue: 2, yValue: 3),
-
+      CaseModel(xValue: 2, yValue: 0),
       CaseModel(xValue: 3, yValue: 0, numberTag: 4),
-      CaseModel(xValue: 3, yValue: 1),
+
+      CaseModel(xValue: 0, yValue: 1),
+      CaseModel(xValue: 1, yValue: 1, numberTag: 3),
+      CaseModel(xValue: 2, yValue: 1),
+      CaseModel(xValue: 3, yValue: 1, wallH: true),
+
+      CaseModel(xValue: 0, yValue: 2, numberTag: 2),
+      CaseModel(xValue: 1, yValue: 2),
+      CaseModel(xValue: 2, yValue: 2),
       CaseModel(xValue: 3, yValue: 2),
+
+      CaseModel(xValue: 0, yValue: 3),
+      CaseModel(xValue: 1, yValue: 3),
+      CaseModel(xValue: 2, yValue: 3,),
       CaseModel(xValue: 3, yValue: 3),
     ],
-    firstCase: CaseModel(
-      xValue: 0,
-      yValue: 0,
-      wallH: false,
-      wallV: false,
-      numberTag: 1,
-    ),
+    firstCase: CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1),
     maxTag: 4,
     size: 4,
   );

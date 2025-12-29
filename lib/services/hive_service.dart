@@ -20,6 +20,7 @@ class HiveService {
   /// le string permet de retourner le commentaire à afficher
   ///
   (bool, String) initLevels() {
+    print("❓initialisation des niveaux");
     List<LevelsImport> allLevels = AllLevel.getDefaultList();
 
     if (allLevels.isEmpty || allLevels.length > allLevels.toSet().length) {
@@ -49,7 +50,7 @@ class HiveService {
           cases: casesFinales,
           firstCase: firstCase,
           maxTag: maxTag,
-          size:  result.size!,
+          size: result.size!,
         );
         levelsBox.put(i, value);
       } else if (!result.success) {
@@ -128,6 +129,7 @@ class HiveService {
         bool? wallV;
 
         final cle = (x, y);
+        print("dasn double boucle : $x");
 
         wallH = levelImport.wallH.isNotEmpty && levelImport.wallH.contains(cle)
             ? true
@@ -200,6 +202,6 @@ class ResultLevelGenerator {
     this.cases,
     this.firstTagCase,
     this.maxTag,
-    this.size
+    this.size,
   });
 }

@@ -5,6 +5,7 @@ import 'package:clean_temp/models/level/level_model.dart';
 import 'package:clean_temp/models/money/money_model.dart';
 import 'package:clean_temp/pages/home/home_botom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'models/case/case_model.dart';
@@ -22,7 +23,7 @@ void main() async {
 
   runApp(
     // les providers avec Multiprovider(providers:[])
-    const MyApp(),
+   const ProviderScope(child: MyApp()),
   );
 }
 

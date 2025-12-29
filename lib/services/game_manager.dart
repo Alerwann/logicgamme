@@ -67,8 +67,10 @@ class GameManager extends StateNotifier<SessionState> {
   ) {
     return SessionState(
       levelConfig: niveau,
-      roadList: [niveau.firstCase],
-      roadSet: {niveau.firstCase},
+      // roadList: [niveau.firstCase],
+      roadList: [CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1)],
+      // roadSet: {niveau.firstCase},
+      roadSet: {CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1)},
       lastTagSave: 1,
       statutPartie: EtatGame.loading,
       difficultyMode: TypeDifficulty.normal,
@@ -141,7 +143,7 @@ class GameManager extends StateNotifier<SessionState> {
   /// Il gère le passage de l'état isDrawing à isPlaying au bout du temps imparti
   /// Paramètre :
   /// [endState] est l'état de la partie après l'animation soit en jeu soit en victoire
-  /// [result] est l'état de la session après la vérification pour mettre à jour la route finale après l'animation 
+  /// [result] est l'état de la session après la vérification pour mettre à jour la route finale après l'animation
   void _startAnimationTimer(EtatGame endState, SessionState result) {
     const int tickMs = 20;
     double progress = 0;
@@ -152,7 +154,8 @@ class GameManager extends StateNotifier<SessionState> {
       progress += step;
 
       if (progress < 1.0) {
-        state = state.copyWith(animationProgress: progress);
+        print("❓ result datapainting : ${result.dataPainting!.startCoord.$1}");
+        state = state.copyWith(animationProgress: progress, dataPainting: result.dataPainting!);
       } else {
         timer.cancel();
 
@@ -421,7 +424,9 @@ final gameManagerProvider =
       level,
     ) {
       final hiveService = ref.read(hiveServiceProvider);
+
       final moveManagerService = MoveManagerService();
+
       final moneyService = ref.read(moneyServiceProvider);
 
       final initialMoney = ref.read(moneyProvider);

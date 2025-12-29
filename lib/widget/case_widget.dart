@@ -57,13 +57,19 @@ class _CaseWidgetState extends ConsumerState<CaseWidget> {
             child: levelCaseData.numberTag != null
                 ? Center(
                     child: Container(
+                      width: 50,
+                      height: 50,
+                      
                       decoration: BoxDecoration(
                         color: Colors.black,
-                        borderRadius: BorderRadius.circular(25),
+                        borderRadius: BorderRadius.circular(50),
                       ),
-                      child: Text(
-                        levelCaseData.numberTag.toString(),
-                        textAlign: TextAlign.center,
+                      child: Center(
+                        child: Text(
+                          levelCaseData.numberTag.toString(),                         
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white, fontSize: 30),
+                        ),
                       ),
                     ),
                   )
