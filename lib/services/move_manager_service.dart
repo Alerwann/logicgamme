@@ -122,7 +122,7 @@ class MoveManagerService {
     }
 
     SessionState newState = state.copyWith(
-      statutPartie: EtatGame.isDrawing,
+   
       dataPainting: CoordForPainting(
         startCoord: (lastCase.xValue, lastCase.yValue),
         endCoord: (newCase.xValue, newCase.yValue),

@@ -139,11 +139,30 @@ class GameManager extends StateNotifier<SessionState> {
   /// Gestion du timer de l'animation du dessin
   ///
   /// Il gère le passage de l'état isDrawing à isPlaying au bout du temps imparti
-  void _startAnimationTimer() {
-    _waitDraw = Timer(
-      Duration(milliseconds: Constants.DURATION_DRAWING_MS),
-      () => state = state.copyWith(statutPartie: EtatGame.isPlaying),
-    );
+  /// Paramètre :
+  /// [endState] est l'état de la partie après l'animation soit en jeu soit en victoire
+  /// [result] est l'état de la session après la vérification pour mettre à jour la route finale après l'animation 
+  void _startAnimationTimer(EtatGame endState, SessionState result) {
+    const int tickMs = 20;
+    double progress = 0;
+
+    final double step = tickMs / Constants.DURATION_DRAWING_MS;
+
+    _waitDraw = Timer.periodic(const Duration(milliseconds: tickMs), (timer) {
+      progress += step;
+
+      if (progress < 1.0) {
+        state = state.copyWith(animationProgress: progress);
+      } else {
+        timer.cancel();
+
+        state = result.copyWith(
+          animationProgress: null,
+          dataPainting: null,
+          statutPartie: endState,
+        );
+      }
+    });
   }
 
   /// Permet le nettoyage des contrôleurs
@@ -210,21 +229,13 @@ class GameManager extends StateNotifier<SessionState> {
   /// Si tout le tableau est rempli les sauvegardes sont appelées et passage en Win
   /// Sinon retour comme quoi le tableau n'est pas remplis
 
-  void _checkEndGame() {
-    bool isGridCompleted =
-        state.roadSet.length == state.levelConfig.cases.length;
+  void _checkEndGame(SessionState result) {
+    _timer?.cancel();
 
-    if (isGridCompleted) {
-      _timer?.cancel();
+    _saveRecord(state.levelConfig);
+    _saveWinGame();
 
-      _saveRecord(state.levelConfig);
-      _saveWinGame();
-
-      state = state.copyWith(statutPartie: EtatGame.win);
-    } else {
-      _ref.read(messageProvider.notifier).state =
-          "Attention : le plateau n'est pas entièrement couvert !";
-    }
+    _startAnimationTimer(EtatGame.win, result);
   }
 
   // Gestion de la partie et ses mouvements
@@ -248,7 +259,7 @@ class GameManager extends StateNotifier<SessionState> {
         state.roadList.last == newCase) {
       return;
     }
-
+    state = state.copyWith(statutPartie: EtatGame.waitVerifRoad);
     if (_tempsEcoule.inSeconds == 0 && state.roadSet.length == 1) {
       _startTimer(sDurationLevel);
     }
@@ -262,14 +273,21 @@ class GameManager extends StateNotifier<SessionState> {
 
     switch (codeFeedback) {
       case MoveStatusCode.success:
-        state = result.sessionState;
-        _startAnimationTimer();
+        state = state.copyWith(statutPartie: EtatGame.isDrawing);
+
+        _startAnimationTimer(EtatGame.isPlaying, result.sessionState);
         break;
       case MoveStatusCode.successlastTagCheck:
-        {/// réflexion en cours pour que le timer se lance et qu'après l'animation se fasse
+        {
+          /// réflexion en cours pour que le timer se lance et qu'après l'animation se fasse
           state = result.sessionState;
-       
-          _checkEndGame();
+          if (state.roadSet.length == state.levelConfig.cases.length) {
+            _checkEndGame(result.sessionState);
+          } else {
+            _ref.read(messageProvider.notifier).state =
+                "Attention : le plateau n'est pas entièrement couvert !";
+            state = state.copyWith(statutPartie: EtatGame.isPlaying);
+          }
         }
         break;
       case MoveStatusCode.wallError:
@@ -278,26 +296,37 @@ class GameManager extends StateNotifier<SessionState> {
             ? "aux coordonées (${result.errorCase?.xValue},${result.errorCase?.yValue})"
             : "";
         _ref.read(messageProvider.notifier).state = "Il y a un mur $coords";
+        state = state.copyWith(statutPartie: EtatGame.isPlaying);
         break;
       case MoveStatusCode.tagError:
         _ref.read(messageProvider.notifier).state =
             "L'ordre des cibles n'est pas respecté dans la case $coords";
+        state = state.copyWith(statutPartie: EtatGame.isPlaying);
+
         break;
       case MoveStatusCode.alreadyVisitedError:
         _ref.read(messageProvider.notifier).state =
             "Il est interdit de passer deux fois au même endroit";
+        state = state.copyWith(statutPartie: EtatGame.isPlaying);
+
         break;
       case MoveStatusCode.notOrthoError:
         _ref.read(messageProvider.notifier).state =
             "Le mouvement est soit horizontal soit vertical uniquement";
+        state = state.copyWith(statutPartie: EtatGame.isPlaying);
+
         break;
       case MoveStatusCode.internalError:
         _ref.read(messageProvider.notifier).state =
             "Erreur de l'application. Merci de contacter le créateur";
+        state = state.copyWith(statutPartie: EtatGame.isPlaying);
+
         break;
       case MoveStatusCode.successCancel:
         _ref.read(messageProvider.notifier).state =
             "Annulation du chemin effectuée";
+        state = result.sessionState.copyWith(statutPartie: EtatGame.isPlaying);
+        break;
     }
   }
 

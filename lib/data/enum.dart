@@ -21,6 +21,8 @@ enum EtatGame {
   chooseAddTime,
   /// En attente de la fin du dessin de la fin du tracé
   isDrawing,
+  /// Attente de véification du tracé
+  waitVerifRoad,
 }
 
 enum MoveStatusCode {
