@@ -39,6 +39,9 @@ class SessionState {
   /// Les offsets pour la création du dessin
   final CoordForPainting? dataPainting;
 
+  /// Variable indiquant la progression de l'animation
+  final double? animationProgress;
+
   SessionState({
     required this.levelConfig,
     required this.roadList,
@@ -47,7 +50,8 @@ class SessionState {
     required this.statutPartie,
     required this.difficultyMode,
     required this.moneyData,
-    this.dataPainting
+    this.dataPainting,
+    this.animationProgress
   });
 
   ///Utilise la copy pour te pas casser l'immuabilité du modèle
@@ -60,6 +64,7 @@ class SessionState {
     TypeDifficulty? difficultyMode,
     MoneyModel? moneyData,
     CoordForPainting? dataPainting,
+    double? animationProgress
   }) {
     return SessionState(
       levelConfig: levelConfig ?? this.levelConfig,
@@ -69,7 +74,8 @@ class SessionState {
       statutPartie: statutPartie ?? this.statutPartie,
       difficultyMode: difficultyMode ?? this.difficultyMode,
       moneyData: moneyData ?? this.moneyData,
-      dataPainting: dataPainting 
+      dataPainting: dataPainting,
+      animationProgress: animationProgress
     );
   }
 
@@ -89,7 +95,8 @@ class SessionState {
           statutPartie == other.statutPartie &&
           difficultyMode == other.difficultyMode &&
           moneyData == other.moneyData &&
-          dataPainting == other.dataPainting;
+          dataPainting == other.dataPainting &&
+          animationProgress == other.animationProgress ;
 
   @override
   int get hashCode => Object.hash(
@@ -100,5 +107,6 @@ class SessionState {
     difficultyMode,
     moneyData,
     dataPainting,
+    animationProgress
   );
 }
