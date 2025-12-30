@@ -101,11 +101,12 @@ class MoveManagerService {
         statusCode: MoveStatusCode.tagError,
         errorCase: resultTagTest.errorCase,
       );
-    } else {
-      final int indexTosave = resultTagTest.lastTag;
-      if (indexTosave == state.levelConfig.maxTag) {
-        lastBaliseCheck = true;
-      }
+    }
+
+    currentTagIndex = resultTagTest.lastTag;
+
+    if (currentTagIndex == state.levelConfig.maxTag) {
+      lastBaliseCheck = true;
     }
 
     //Test la présence de mur bloquant
@@ -120,8 +121,7 @@ class MoveManagerService {
         errorCase: resultTestWall.$2,
       );
     }
-    print("coordonnée du début : (${lastCase.xValue}, ${lastCase.yValue})");
-    print("coordonnée de fin : (${newCase.xValue}, ${newCase.yValue})");
+
     SessionState newState = state.copyWith(
       dataPainting: CoordForPainting(
         startCoord: (lastCase.xValue, lastCase.yValue),
@@ -293,7 +293,7 @@ class MoveManagerService {
 
   ResultOrderTag testOderTag(int lastTagSave, List<CaseModel> newRoad) {
     int temporyTag = lastTagSave;
-
+    print("🔍 lastTag Level : $lastTagSave");
     for (var cases in newRoad) {
       if (cases.numberTag != null) {
         if (cases.numberTag == temporyTag + 1) {

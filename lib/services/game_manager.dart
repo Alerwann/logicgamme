@@ -32,6 +32,10 @@ class GameManager extends StateNotifier<SessionState> {
   Duration get tempsEcoule => _tempsEcoule;
 
   int _resultTimer = 0;
+  int get resultTimer => _resultTimer;
+
+  int _maxCurrentValue = 0;
+  int get maxCurrentValue => _maxCurrentValue;
 
   final HiveService _hiveService;
   final MoneyService _moneyService;
@@ -98,6 +102,8 @@ class GameManager extends StateNotifier<SessionState> {
 
   void _startTimer(int sDurationLevel) {
     _resultTimer = sDurationLevel;
+    _maxCurrentValue = sDurationLevel;
+
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _tempsEcoule = _tempsEcoule + const Duration(seconds: 1);
 
@@ -154,8 +160,10 @@ class GameManager extends StateNotifier<SessionState> {
       progress += step;
 
       if (progress < 1.0) {
-        print("❓ result datapainting : ${result.dataPainting!.startCoord.$1}");
-        state = state.copyWith(animationProgress: progress, dataPainting: result.dataPainting!);
+        state = state.copyWith(
+          animationProgress: progress,
+          dataPainting: result.dataPainting!,
+        );
       } else {
         timer.cancel();
 
@@ -232,11 +240,11 @@ class GameManager extends StateNotifier<SessionState> {
   /// Si tout le tableau est rempli les sauvegardes sont appelées et passage en Win
   /// Sinon retour comme quoi le tableau n'est pas remplis
 
-  void _checkEndGame(SessionState result) {
+  void _checkEndGame(SessionState result) async {
     _timer?.cancel();
 
-    _saveRecord(state.levelConfig);
-    _saveWinGame();
+    await _saveRecord(state.levelConfig);
+    await _saveWinGame();
 
     _startAnimationTimer(EtatGame.win, result);
   }

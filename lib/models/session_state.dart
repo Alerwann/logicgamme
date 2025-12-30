@@ -42,6 +42,10 @@ class SessionState {
   /// Variable indiquant la progression de l'animation
   final double? animationProgress;
 
+  final double? remainingTimePercent;
+
+  final Duration? elapsedTimeSeconds;
+
   SessionState({
     required this.levelConfig,
     required this.roadList,
@@ -51,7 +55,9 @@ class SessionState {
     required this.difficultyMode,
     required this.moneyData,
     this.dataPainting,
-    this.animationProgress
+    this.animationProgress,
+    this.remainingTimePercent,
+    this.elapsedTimeSeconds,
   });
 
   ///Utilise la copy pour te pas casser l'immuabilité du modèle
@@ -64,7 +70,8 @@ class SessionState {
     TypeDifficulty? difficultyMode,
     MoneyModel? moneyData,
     CoordForPainting? dataPainting,
-    double? animationProgress
+    double? animationProgress,
+    (double, Duration)? timeInformations,
   }) {
     return SessionState(
       levelConfig: levelConfig ?? this.levelConfig,
@@ -75,7 +82,9 @@ class SessionState {
       difficultyMode: difficultyMode ?? this.difficultyMode,
       moneyData: moneyData ?? this.moneyData,
       dataPainting: dataPainting,
-      animationProgress: animationProgress
+      animationProgress: animationProgress,
+      remainingTimePercent: remainingTimePercent,
+      elapsedTimeSeconds: elapsedTimeSeconds,
     );
   }
 
@@ -96,7 +105,9 @@ class SessionState {
           difficultyMode == other.difficultyMode &&
           moneyData == other.moneyData &&
           dataPainting == other.dataPainting &&
-          animationProgress == other.animationProgress ;
+          animationProgress == other.animationProgress &&
+          remainingTimePercent == other.remainingTimePercent &&
+          elapsedTimeSeconds == other.elapsedTimeSeconds;
 
   @override
   int get hashCode => Object.hash(
@@ -107,6 +118,8 @@ class SessionState {
     difficultyMode,
     moneyData,
     dataPainting,
-    animationProgress
+    animationProgress,
+    remainingTimePercent,
+    elapsedTimeSeconds,
   );
 }

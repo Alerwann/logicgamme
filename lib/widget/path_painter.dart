@@ -9,8 +9,7 @@ class PathPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // print("🎨 Dessin en cours... Progrès : ${state.animationProgress}");
-    // print("🔍 state info : ${state.dataPainting} ");
+
     final double cellSize = size.width / state.levelConfig.size;
 
     final paint = Paint()
@@ -53,13 +52,11 @@ class PathPainter extends CustomPainter {
 
     // BLOC 2 : Le trait animé (Le Présent)
     if (state.dataPainting != null) {
-      print("🔍If du bloc2");
       final offsets = CalculCoordonnee.dataForPainting(
         state.dataPainting!,
         cellSize,
       );
-      print(offsets.startOffset.$2);
-      print(offsets.endOffset.$2);
+
       final start = Offset(offsets.startOffset.$1, offsets.startOffset.$2);
       final end = Offset(offsets.endOffset.$1, offsets.endOffset.$2);
 
