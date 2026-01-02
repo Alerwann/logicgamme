@@ -40,7 +40,7 @@ void main() {
       numberTag: 1,
     ),
     maxTag: 4,
-    size: 4
+    size: 4,
   );
 
   final MoneyModel money = MoneyModel(
@@ -58,6 +58,8 @@ void main() {
     statutPartie: EtatGame.isPlaying,
     difficultyMode: TypeDifficulty.normal,
     moneyData: money,
+    timerState: TimerAction.init,
+    actualValue: 0,
   );
 
   group('move-manage - case gestion', () {
@@ -162,6 +164,8 @@ void main() {
         statutPartie: EtatGame.isPlaying,
         difficultyMode: TypeDifficulty.normal,
         moneyData: money,
+        timerState: TimerAction.init,
+        actualValue: 0,
       );
 
       final result = moveManageService.handleMove(
@@ -212,6 +216,8 @@ void main() {
         statutPartie: EtatGame.isPlaying,
         difficultyMode: TypeDifficulty.normal,
         moneyData: money,
+        timerState: TimerAction.init,
+        actualValue: 0,
       );
 
       final excepStatewithoutTag = SessionState(
@@ -222,6 +228,8 @@ void main() {
         statutPartie: EtatGame.isPlaying,
         difficultyMode: TypeDifficulty.normal,
         moneyData: money,
+        timerState: TimerAction.init,
+        actualValue: 0,
       );
 
       final resultWOTag = moveManageService.handleMove(

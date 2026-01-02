@@ -20,7 +20,6 @@ class HiveService {
   /// le string permet de retourner le commentaire à afficher
   ///
   (bool, String) initLevels() {
-    print("❓initialisation des niveaux");
     List<LevelsImport> allLevels = AllLevel.getDefaultList();
 
     if (allLevels.isEmpty || allLevels.length > allLevels.toSet().length) {
@@ -86,7 +85,6 @@ class HiveService {
       }
     } catch (e) {
       if (kDebugMode) {
-        print("Erreur de sauvegarde de record Hive : $e");
       }
     }
     return false;
@@ -129,7 +127,6 @@ class HiveService {
         bool? wallV;
 
         final cle = (x, y);
-        print("dasn double boucle : $x");
 
         wallH = levelImport.wallH.isNotEmpty && levelImport.wallH.contains(cle)
             ? true

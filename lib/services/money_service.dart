@@ -193,7 +193,7 @@ class MoneyService {
       await newState.save();
     } catch (e) {
       if (kDebugMode) {
-        print("erreur de la sauvegarde de money : $e");
+
         return ResultActionBonus(
           isDo: false,
           statusCode: BuyStatusCode.saveKO,

@@ -27,15 +27,14 @@ class GameManager extends StateNotifier<SessionState> {
   Timer? _waitDiff;
   Timer? _waitDraw;
 
-  Duration _tempsEcoule = Duration.zero;
+  int _tempsEcoule = 0;
+  int get tempsEcoule => _tempsEcoule;
 
-  Duration get tempsEcoule => _tempsEcoule;
-
-  int _resultTimer = 0;
-  int get resultTimer => _resultTimer;
-
-  int _maxCurrentValue = 0;
+  int _maxCurrentValue = Constants.DURATION_NORMAL_MODE;
   int get maxCurrentValue => _maxCurrentValue;
+
+  double _ratioTime = 1;
+  double get ratioTime => _ratioTime;
 
   final HiveService _hiveService;
   final MoneyService _moneyService;
@@ -79,6 +78,8 @@ class GameManager extends StateNotifier<SessionState> {
       statutPartie: EtatGame.loading,
       difficultyMode: TypeDifficulty.normal,
       moneyData: money,
+      actualValue: 0,
+      timerState: TimerAction.init,
     );
   }
 
@@ -100,18 +101,25 @@ class GameManager extends StateNotifier<SessionState> {
   ///   - si assez pour acheté passe l'état en chooseAddtime pour déclancé un popup de choix
   ///   - si pas assez passe l'état en loose pour signaler la perte de la partie
 
-  void _startTimer(int sDurationLevel) {
-    _resultTimer = sDurationLevel;
-    _maxCurrentValue = sDurationLevel;
+  void _startTimer() {
+    print("$_maxCurrentValue est la durée du timer");
+    state = state.copyWith(timerState: TimerAction.play);
 
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _tempsEcoule = _tempsEcoule + const Duration(seconds: 1);
+      _tempsEcoule = _tempsEcoule + 1;
 
-      _resultTimer -= 1;
+      state = state.copyWith(actualValue: _tempsEcoule);
 
-      if (_resultTimer == 0) {
+      if (_tempsEcoule == _maxCurrentValue) {
         timer.cancel();
-        state = state.copyWith(statutPartie: EtatGame.waitAddTime);
+
+        // le temps additionnel existe uniquement si le temps est consommé en entier + bonus
+        // réinitialisation de la barre à vide
+        state = state.copyWith(
+          timerState: TimerAction.stop,
+          statutPartie: EtatGame.waitAddTime,
+        );
+
         final chekBonus = _moneyService.canUseBonus(
           state.moneyData,
           TypeBonus.bonusTime,
@@ -131,7 +139,10 @@ class GameManager extends StateNotifier<SessionState> {
   /// passe l'état de la partie en pause
   void pauseTime() {
     _timer?.cancel();
-    state = state.copyWith(statutPartie: EtatGame.pause);
+    state = state.copyWith(
+      statutPartie: EtatGame.pause,
+      timerState: TimerAction.pause,
+    );
   }
 
   /// Permet de redémarrer le timer après une pause
@@ -139,7 +150,8 @@ class GameManager extends StateNotifier<SessionState> {
   /// repasse la partie en isPalaying
   void resumeTime() {
     if (state.statutPartie == EtatGame.pause) {
-      _startTimer(_resultTimer);
+      _startTimer();
+      _ratioTime = _maxCurrentValue != 0 ? _tempsEcoule / _maxCurrentValue : 1;
       state = state.copyWith(statutPartie: EtatGame.isPlaying);
     }
   }
@@ -190,12 +202,12 @@ class GameManager extends StateNotifier<SessionState> {
   /// Après vérification si le record est battut, envoie de la demande de sauvegarde
   ///
   Future<void> _saveRecord(LevelModel level) async {
-    if (level.bestRecordNormalSeconds > _tempsEcoule.inSeconds) {
+    if (level.bestRecordNormalSeconds > _tempsEcoule) {
       try {
-        await _hiveService.saveRecord(level.levelId, _tempsEcoule.inSeconds);
+        await _hiveService.saveRecord(level.levelId, _tempsEcoule);
 
         _ref.read(messageProvider.notifier).state =
-            "Nouveau record de ${_tempsEcoule.inSeconds} secondes sauvegardé !";
+            "Nouveau record de $_tempsEcoule secondes sauvegardé !";
       } catch (e) {
         _ref.read(messageProvider.notifier).state =
             "Erreur lors de la sauvegarde du record. Contacter le support.";
@@ -256,27 +268,22 @@ class GameManager extends StateNotifier<SessionState> {
   /// Pour que le joueur puisse jouer l'état doit être [isPlaying]
   /// Ordone le lancement timer si c'est le premier mouvement
   void handleMove(CaseModel newCase) {
-    int sDurationLevel;
-    switch (state.difficultyMode) {
-      case TypeDifficulty.normal:
-        sDurationLevel = Constants.DURATION_NORMAL_MODE;
-        break;
-      case TypeDifficulty.hard:
-        sDurationLevel = Constants.DURATION_HARD_MODE;
-        break;
-    }
-
     if (state.statutPartie != EtatGame.isPlaying ||
         state.roadList.last == newCase) {
       return;
     }
-    state = state.copyWith(statutPartie: EtatGame.waitVerifRoad);
-    if (_tempsEcoule.inSeconds == 0 && state.roadSet.length == 1) {
-      _startTimer(sDurationLevel);
-    }
-    final result = _moveManageService.handleMove(state, newCase);
 
+    state = state.copyWith(statutPartie: EtatGame.waitVerifRoad);
+
+    final result = _moveManageService.handleMove(state, newCase);
     final codeFeedback = result.statusCode;
+
+    if (_tempsEcoule == 0 &&
+        state.roadSet.length == 1 &&
+        codeFeedback == MoveStatusCode.success) {
+      _startTimer();
+    }
+
     final CaseModel? errorCase = result.errorCase;
     String coords = (errorCase != null)
         ? "aux coordonées (${result.errorCase?.xValue},${result.errorCase?.yValue})"
@@ -290,9 +297,10 @@ class GameManager extends StateNotifier<SessionState> {
         break;
       case MoveStatusCode.successlastTagCheck:
         {
-          /// réflexion en cours pour que le timer se lance et qu'après l'animation se fasse
           state = result.sessionState;
           if (state.roadSet.length == state.levelConfig.cases.length) {
+            state = state.copyWith(timerState: TimerAction.stop);
+
             _checkEndGame(result.sessionState);
           } else {
             _ref.read(messageProvider.notifier).state =
@@ -353,6 +361,7 @@ class GameManager extends StateNotifier<SessionState> {
   /// Passage à isPlaying en fin quoi qu'il arrive
   Future<void> difficultyChoose(bool chooseHard) async {
     if (!chooseHard) {
+      _maxCurrentValue = Constants.DURATION_NORMAL_MODE;
       state = state.copyWith(statutPartie: EtatGame.isPlaying);
     } else {
       try {
@@ -362,11 +371,13 @@ class GameManager extends StateNotifier<SessionState> {
         );
 
         if (resultBuy.isDo) {
+          _maxCurrentValue = Constants.DURATION_HARD_MODE;
           state = state.copyWith(
             moneyData: resultBuy.state,
             difficultyMode: TypeDifficulty.hard,
             statutPartie: EtatGame.isPlaying,
           );
+
           _ref.read(messageProvider.notifier).state =
               "Bonne chance pour le mode Hard !";
         }
@@ -374,7 +385,7 @@ class GameManager extends StateNotifier<SessionState> {
         if (kDebugMode) {
           print("Erreur lors du changement de difficultées : $e");
         }
-
+        _maxCurrentValue = Constants.DURATION_NORMAL_MODE;
         state = state.copyWith(statutPartie: EtatGame.isPlaying);
         _ref.read(messageProvider.notifier).state =
             "Echec du changement de niveau de difficultés. Niveau joué en normal";
@@ -396,6 +407,7 @@ class GameManager extends StateNotifier<SessionState> {
   ///
   Future<void> addTimechoose(bool chooseTime) async {
     if (!chooseTime) {
+
       state = state.copyWith(statutPartie: EtatGame.loose);
     } else {
       try {
@@ -405,12 +417,15 @@ class GameManager extends StateNotifier<SessionState> {
         );
 
         if (resultBuy.isDo) {
+          _maxCurrentValue = _tempsEcoule + Constants.TIME_ADD_SECONDS;
+          _ratioTime = 1;
+
           state = state.copyWith(
             moneyData: resultBuy.state,
             difficultyMode: TypeDifficulty.normal,
             statutPartie: EtatGame.isPlaying,
           );
-          _startTimer(Constants.TIME_ADD_SECONDS);
+          _startTimer();
         }
       } catch (e) {
         if (kDebugMode) {

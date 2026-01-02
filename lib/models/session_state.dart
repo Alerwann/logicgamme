@@ -42,9 +42,9 @@ class SessionState {
   /// Variable indiquant la progression de l'animation
   final double? animationProgress;
 
-  final double? remainingTimePercent;
+  final int actualValue;
 
-  final Duration? elapsedTimeSeconds;
+  final TimerAction timerState;
 
   SessionState({
     required this.levelConfig,
@@ -54,10 +54,16 @@ class SessionState {
     required this.statutPartie,
     required this.difficultyMode,
     required this.moneyData,
+
+    // animation du chemin
     this.dataPainting,
     this.animationProgress,
-    this.remainingTimePercent,
-    this.elapsedTimeSeconds,
+
+    // animation du timer
+    required this.actualValue,
+
+    // déclanchement animation
+    required this.timerState,
   });
 
   ///Utilise la copy pour te pas casser l'immuabilité du modèle
@@ -69,9 +75,12 @@ class SessionState {
     EtatGame? statutPartie,
     TypeDifficulty? difficultyMode,
     MoneyModel? moneyData,
+
     CoordForPainting? dataPainting,
     double? animationProgress,
-    (double, Duration)? timeInformations,
+
+    int? actualValue,
+    TimerAction? timerState,
   }) {
     return SessionState(
       levelConfig: levelConfig ?? this.levelConfig,
@@ -81,10 +90,12 @@ class SessionState {
       statutPartie: statutPartie ?? this.statutPartie,
       difficultyMode: difficultyMode ?? this.difficultyMode,
       moneyData: moneyData ?? this.moneyData,
+
       dataPainting: dataPainting,
       animationProgress: animationProgress,
-      remainingTimePercent: remainingTimePercent,
-      elapsedTimeSeconds: elapsedTimeSeconds,
+
+      actualValue: actualValue ?? this.actualValue,
+      timerState: timerState ?? this.timerState,
     );
   }
 
@@ -106,8 +117,8 @@ class SessionState {
           moneyData == other.moneyData &&
           dataPainting == other.dataPainting &&
           animationProgress == other.animationProgress &&
-          remainingTimePercent == other.remainingTimePercent &&
-          elapsedTimeSeconds == other.elapsedTimeSeconds;
+          actualValue == other.actualValue &&
+          timerState == other.timerState;
 
   @override
   int get hashCode => Object.hash(
@@ -119,7 +130,7 @@ class SessionState {
     moneyData,
     dataPainting,
     animationProgress,
-    remainingTimePercent,
-    elapsedTimeSeconds,
+    actualValue,
+    timerState,
   );
 }

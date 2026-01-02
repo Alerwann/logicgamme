@@ -67,3 +67,7 @@ enum CodeLevelGenerator {
   countTagKo , 
   /// Le niveau n'existe pas
   levelNotExist}
+
+enum TimerAction {
+  play,pause, stop, addTime, backToPause,init
+}

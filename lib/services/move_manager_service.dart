@@ -138,9 +138,7 @@ class MoveManagerService {
         statusCode: MoveStatusCode.successlastTagCheck,
       );
     }
-    print(
-      "🔍❓ datapainting du service : ${newState.dataPainting!.endCoord.$2}",
-    );
+
     return MoveResult(
       sessionState: newState,
       statusCode: MoveStatusCode.success,
@@ -293,7 +291,6 @@ class MoveManagerService {
 
   ResultOrderTag testOderTag(int lastTagSave, List<CaseModel> newRoad) {
     int temporyTag = lastTagSave;
-    print("🔍 lastTag Level : $lastTagSave");
     for (var cases in newRoad) {
       if (cases.numberTag != null) {
         if (cases.numberTag == temporyTag + 1) {
