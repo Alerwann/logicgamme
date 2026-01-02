@@ -2,10 +2,11 @@ import 'package:clean_temp/models/case/case_model.dart';
 import 'package:clean_temp/models/data_for_painting.dart';
 import 'package:clean_temp/models/level/level_model.dart';
 import 'package:clean_temp/utils/calcul_coordonnee.dart';
+import 'package:clean_temp/widget/gridStack/animated_path_layer.dart';
 import 'package:flutter/material.dart';
 
 class PathPainter extends CustomPainter {
-  final (CoordForPainting?, List<CaseModel>, double?) provid;
+  final DataForAnimation provid;
   final LevelModel level;
 
   PathPainter({required this.level, required this.provid});
@@ -13,20 +14,11 @@ class PathPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final double cellSize = size.width / level.size;
-    final List<CaseModel> roadlist = provid.$2;
+    final List<CaseModel> roadlist = provid.roadList;
 
-    // définition de la première case du jeu pas forcément (0,0)
-    final firstCaseX = roadlist[0].xValue;
-    final firstCaseY = roadlist[0].yValue;
+    final CoordForPainting dataPainting = provid.coordForPainting;
 
-    final CoordForPainting dataPainting =
-        provid.$1 ??
-        CoordForPainting(
-          startCoord: (firstCaseX, firstCaseY),
-          endCoord: (firstCaseX, firstCaseY),
-        );
-        
-    final animationProgress = provid.$3 ?? 0;
+    final animationProgress = provid.animationProgress;
 
     final paint = Paint()
       ..color = Colors.green
@@ -83,7 +75,7 @@ class PathPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant PathPainter oldDelegate) {
-    return oldDelegate.provid.$2 != provid.$2 ||
-        oldDelegate.provid.$3 != provid.$3;
+    return oldDelegate.provid.roadList != provid.roadList ||
+        oldDelegate.provid.animationProgress != provid.animationProgress;
   }
 }

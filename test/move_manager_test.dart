@@ -60,6 +60,7 @@ void main() {
     moneyData: money,
     timerState: TimerAction.init,
     actualValue: 0,
+    error: ErrorPlayer.none,
   );
 
   group('move-manage - case gestion', () {
@@ -135,7 +136,7 @@ void main() {
         CaseModel(xValue: 3, yValue: 0, numberTag: 4),
       );
       expect(result.errorCase, CaseModel(xValue: 3, yValue: 0, numberTag: 4));
-      expect(result.statusCode, MoveStatusCode.tagError);
+      expect(result.statusCode, MoveStatusCode.otherError);
 
       expect(result.sessionState, sessionG);
     });
@@ -166,6 +167,7 @@ void main() {
         moneyData: money,
         timerState: TimerAction.init,
         actualValue: 0,
+        error: ErrorPlayer.other,
       );
 
       final result = moveManageService.handleMove(
@@ -174,7 +176,7 @@ void main() {
       );
 
       expect(result.errorCase!.yValue, 1);
-      expect(result.statusCode, MoveStatusCode.alreadyVisitedError);
+      expect(result.statusCode, MoveStatusCode.otherError);
 
       expect(result.sessionState, session);
     });
@@ -218,6 +220,7 @@ void main() {
         moneyData: money,
         timerState: TimerAction.init,
         actualValue: 0,
+        error: ErrorPlayer.none,
       );
 
       final excepStatewithoutTag = SessionState(
@@ -230,15 +233,16 @@ void main() {
         moneyData: money,
         timerState: TimerAction.init,
         actualValue: 0,
+        error: ErrorPlayer.none,
       );
 
-      final resultWOTag = moveManageService.handleMove(
+      final resultWOTag = moveManageService.cancelMove(
         state,
         CaseModel(xValue: 0, yValue: 0, numberTag: 1),
       );
 
-      expect(resultWOTag.sessionState, excepStatewithoutTag);
-      expect(resultWOTag.statusCode, MoveStatusCode.successCancel);
+      expect(resultWOTag, excepStatewithoutTag);
+
     });
   });
 

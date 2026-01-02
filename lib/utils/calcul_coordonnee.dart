@@ -5,7 +5,7 @@ class CalculCoordonnee {
     (int, int) coord,
     double sizeOneCase,
   ) {
-    double centerXCoord = (coord.$1 +0.5) * sizeOneCase;
+    double centerXCoord = (coord.$1 + 0.5) * sizeOneCase;
     double centerYCoord = (coord.$2 + 0.5) * sizeOneCase;
 
     return (centerXCoord, centerYCoord);
@@ -20,4 +20,7 @@ class CalculCoordonnee {
 
     return OffsetsForPainting(startOffset: startOffset, endOffset: endOffset);
   }
+
+
+
 }

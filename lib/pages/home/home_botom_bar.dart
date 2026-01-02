@@ -58,7 +58,7 @@ class _HomeBottomBarState extends State<HomeBottomBar> {
       CaseModel(xValue: 5, yValue: 5),
     ],
     firstCase: CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1),
-    maxTag: 5,
+    maxTag: 4,
     size: 6,
   );
 

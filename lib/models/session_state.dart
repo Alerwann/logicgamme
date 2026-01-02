@@ -46,6 +46,8 @@ class SessionState {
 
   final TimerAction timerState;
 
+  final ErrorPlayer error;
+
   SessionState({
     required this.levelConfig,
     required this.roadList,
@@ -64,6 +66,9 @@ class SessionState {
 
     // déclanchement animation
     required this.timerState,
+
+    // déclanche les erreurs
+    required this.error,
   });
 
   ///Utilise la copy pour te pas casser l'immuabilité du modèle
@@ -81,6 +86,8 @@ class SessionState {
 
     int? actualValue,
     TimerAction? timerState,
+
+    ErrorPlayer? error,
   }) {
     return SessionState(
       levelConfig: levelConfig ?? this.levelConfig,
@@ -96,6 +103,8 @@ class SessionState {
 
       actualValue: actualValue ?? this.actualValue,
       timerState: timerState ?? this.timerState,
+
+      error: error ?? this.error,
     );
   }
 
@@ -118,7 +127,8 @@ class SessionState {
           dataPainting == other.dataPainting &&
           animationProgress == other.animationProgress &&
           actualValue == other.actualValue &&
-          timerState == other.timerState;
+          timerState == other.timerState &&
+          error == other.error;
 
   @override
   int get hashCode => Object.hash(
@@ -132,5 +142,6 @@ class SessionState {
     animationProgress,
     actualValue,
     timerState,
+    error,
   );
 }

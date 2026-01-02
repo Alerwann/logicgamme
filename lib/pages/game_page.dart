@@ -30,10 +30,7 @@ class GamePage extends ConsumerWidget {
               ),
             ),
 
-            Expanded(
-              flex: 1,
-              child: Text("Widget message à faire "),
-            ), // écoute messenger
+      
           ],
         ),
       ),

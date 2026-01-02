@@ -8,29 +8,7 @@ import 'package:clean_temp/models/session_state.dart';
 
 class MoveManagerService {
 
-  /// Fonction d'annulation 
-  /// Le cas case appuye est la dernière est exclus
-  /// Renvoie que le nouvel état à jour
 
-    SessionState cancelMove(SessionState state, CaseModel newCase) {
-    final index = state.roadList.indexOf(newCase);
-    final newRoad = state.roadList.sublist(0, index + 1);
-
-    int newMaxTag = 0;
-    for (var c in newRoad) {
-      if (c.numberTag != null) {
-        if (c.numberTag! > newMaxTag) {
-          newMaxTag = c.numberTag!;
-        }
-      }
-    }
-    final newState = state.copyWith(
-      roadList: newRoad,
-      roadSet: newRoad.toSet(),
-      lastTagSave: newMaxTag,
-    );
-    return newState;
-  }
   /// fonciton d'entrée de mouvement
   ///
   /// A chaque tentative de mouvement cette fonction est appelée
@@ -42,14 +20,35 @@ class MoveManagerService {
   ///
   /// Retourne un MoveResult :
   /// le statut d'aboutissement du mouvement , l'état modifié si réussite sinon l'état initial , la case qui a posé erreur si nécessaire
-  /// 
-  /// 
-  /// 
   MoveResult handleMove(SessionState state, CaseModel newCase) {
     final CaseModel lastCase = state.roadList.last;
 
     bool lastBaliseCheck = false;
     int currentTagIndex = state.lastTagSave;
+
+    /// Si le joueur appuie sur une case déjà compté cela fait l'annulation du chemin
+    if (state.roadSet.contains(newCase)) {
+      final index = state.roadList.indexOf(newCase);
+      final newRoad = state.roadList.sublist(0, index + 1);
+
+      int newMaxTag = 0;
+      for (var c in newRoad) {
+        if (c.numberTag != null) {
+          if (c.numberTag! > newMaxTag) {
+            newMaxTag = c.numberTag!;
+          }
+        }
+      }
+      final newState = state.copyWith(
+        roadList: newRoad,
+        roadSet: newRoad.toSet(),
+        lastTagSave: newMaxTag,
+      );
+      return MoveResult(
+        sessionState: newState,
+        statusCode: MoveStatusCode.success,
+      );
+    }
 
     /// Définition si le mouvement est horizontal ou vertical ou les deux et le sens du mouvement
     final directionData = testDirection(lastCase, newCase);

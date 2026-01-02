@@ -36,6 +36,9 @@ class GameManager extends StateNotifier<SessionState> {
   double _ratioTime = 1;
   double get ratioTime => _ratioTime;
 
+  Set<CaseModel> _errorSetCase = {};
+  Set<CaseModel> get errorSetCase => _errorSetCase;
+
   final HiveService _hiveService;
   final MoneyService _moneyService;
 
@@ -80,6 +83,7 @@ class GameManager extends StateNotifier<SessionState> {
       moneyData: money,
       actualValue: 0,
       timerState: TimerAction.init,
+      error: ErrorPlayer.none,
     );
   }
 
@@ -168,6 +172,8 @@ class GameManager extends StateNotifier<SessionState> {
 
     final double step = tickMs / Constants.DURATION_DRAWING_MS;
 
+    state = state.copyWith(statutPartie: EtatGame.isDrawing);
+
     _waitDraw = Timer.periodic(const Duration(milliseconds: tickMs), (timer) {
       progress += step;
 
@@ -254,11 +260,19 @@ class GameManager extends StateNotifier<SessionState> {
 
   void _checkEndGame(SessionState result) async {
     _timer?.cancel();
+    if (state.roadSet.length == state.levelConfig.cases.length) {
+      await _saveRecord(state.levelConfig);
+      await _saveWinGame();
 
-    await _saveRecord(state.levelConfig);
-    await _saveWinGame();
-
-    _startAnimationTimer(EtatGame.win, result);
+      _startAnimationTimer(EtatGame.win, result);
+    }
+    {
+      _errorSetCase = state.levelConfig.cases.toSet().difference(state.roadSet.toSet());
+      state = state.copyWith(
+        statutPartie: EtatGame.isPlaying,
+        error: ErrorPlayer.other,
+      );
+    }
   }
 
   // Gestion de la partie et ses mouvements
@@ -267,85 +281,70 @@ class GameManager extends StateNotifier<SessionState> {
   ///
   /// Pour que le joueur puisse jouer l'état doit être [isPlaying]
   /// Ordone le lancement timer si c'est le premier mouvement
+
   void handleMove(CaseModel newCase) {
+    MoveResult result;
+    _errorSetCase = {};
+
+    // vérificcation en mode jeu et qu'on
     if (state.statutPartie != EtatGame.isPlaying ||
         state.roadList.last == newCase) {
       return;
     }
 
-    state = state.copyWith(statutPartie: EtatGame.waitVerifRoad);
+    //nettoyage et initialisation
+    state = state.copyWith(
+      statutPartie: EtatGame.waitVerifRoad,
+      error: ErrorPlayer.none,
+    );
 
-    final result = _moveManageService.handleMove(state, newCase);
-    final codeFeedback = result.statusCode;
-
-    if (_tempsEcoule == 0 &&
-        state.roadSet.length == 1 &&
-        codeFeedback == MoveStatusCode.success) {
-      _startTimer();
+    // Demande annulation du chemin
+    // peut etre fait avant l'iniatlisation car la road n'est que la case initiale donc évacué avant
+    if (state.roadSet.contains(newCase)) {
+      final newState = _moveManageService.cancelMove(state, newCase);
+      state = newState.copyWith(statutPartie: EtatGame.isPlaying);
+      return;
     }
 
+    //Envoue des donné au gestionnaire des routes
+    result = _moveManageService.handleMove(state, newCase);
+
+    final codeFeedback = result.statusCode;
     final CaseModel? errorCase = result.errorCase;
-    String coords = (errorCase != null)
-        ? "aux coordonées (${result.errorCase?.xValue},${result.errorCase?.yValue})"
-        : "";
+    final newState = result.sessionState;
 
-    switch (codeFeedback) {
-      case MoveStatusCode.success:
-        state = state.copyWith(statutPartie: EtatGame.isDrawing);
+    if (codeFeedback == MoveStatusCode.success) {
+      if (_tempsEcoule == 0) {
+        _startTimer();
+      }
+      _startAnimationTimer(EtatGame.isPlaying, newState);
+    } else if (codeFeedback == MoveStatusCode.successlastTagCheck) {
+      _checkEndGame(newState);
+    } else
+    // Erreur du joueur dans sa technique
+    // séparation du wall car par la même animation du résultat
+    if (codeFeedback == MoveStatusCode.otherError ||
+        codeFeedback == MoveStatusCode.wallError) {
+      _errorSetCase = errorCase != null ? {errorCase} : {};
 
-        _startAnimationTimer(EtatGame.isPlaying, result.sessionState);
-        break;
-      case MoveStatusCode.successlastTagCheck:
-        {
-          state = result.sessionState;
-          if (state.roadSet.length == state.levelConfig.cases.length) {
-            state = state.copyWith(timerState: TimerAction.stop);
+      final error = codeFeedback == MoveStatusCode.wallError
+          ? ErrorPlayer.wall
+          : ErrorPlayer.other;
 
-            _checkEndGame(result.sessionState);
-          } else {
-            _ref.read(messageProvider.notifier).state =
-                "Attention : le plateau n'est pas entièrement couvert !";
-            state = state.copyWith(statutPartie: EtatGame.isPlaying);
-          }
-        }
-        break;
-      case MoveStatusCode.wallError:
-        final CaseModel? errorCase = result.errorCase;
-        String coords = (errorCase != null)
-            ? "aux coordonées (${result.errorCase?.xValue},${result.errorCase?.yValue})"
-            : "";
-        _ref.read(messageProvider.notifier).state = "Il y a un mur $coords";
-        state = state.copyWith(statutPartie: EtatGame.isPlaying);
-        break;
-      case MoveStatusCode.tagError:
-        _ref.read(messageProvider.notifier).state =
-            "L'ordre des cibles n'est pas respecté dans la case $coords";
-        state = state.copyWith(statutPartie: EtatGame.isPlaying);
+      state = state.copyWith(statutPartie: EtatGame.isPlaying, error: error);
+    } else
+    // Gestion des 2 derniers cas qui eux devront déclancher une snackbarre
+    {
+      final String message = codeFeedback == MoveStatusCode.notOrthoError
+          ? "Le mouvement est soit horizontal soit vertical uniquement"
+          : "Erreur de l'application. Merci de contacter le créateur";
 
-        break;
-      case MoveStatusCode.alreadyVisitedError:
-        _ref.read(messageProvider.notifier).state =
-            "Il est interdit de passer deux fois au même endroit";
-        state = state.copyWith(statutPartie: EtatGame.isPlaying);
+      _ref.read(messageProvider.notifier).state = message;
 
-        break;
-      case MoveStatusCode.notOrthoError:
-        _ref.read(messageProvider.notifier).state =
-            "Le mouvement est soit horizontal soit vertical uniquement";
-        state = state.copyWith(statutPartie: EtatGame.isPlaying);
-
-        break;
-      case MoveStatusCode.internalError:
-        _ref.read(messageProvider.notifier).state =
-            "Erreur de l'application. Merci de contacter le créateur";
-        state = state.copyWith(statutPartie: EtatGame.isPlaying);
-
-        break;
-      case MoveStatusCode.successCancel:
-        _ref.read(messageProvider.notifier).state =
-            "Annulation du chemin effectuée";
-        state = result.sessionState.copyWith(statutPartie: EtatGame.isPlaying);
-        break;
+      state = state.copyWith(
+        statutPartie: EtatGame.isPlaying,
+        error: ErrorPlayer.snackbar,
+      );
     }
   }
 
@@ -407,7 +406,6 @@ class GameManager extends StateNotifier<SessionState> {
   ///
   Future<void> addTimechoose(bool chooseTime) async {
     if (!chooseTime) {
-
       state = state.copyWith(statutPartie: EtatGame.loose);
     } else {
       try {

@@ -1,22 +1,16 @@
 import 'package:clean_temp/models/level/level_model.dart';
-import 'package:clean_temp/services/game_manager.dart';
-import 'package:clean_temp/widget/case_widget.dart';
-import 'package:clean_temp/widget/path_painter.dart';
+import 'package:clean_temp/widget/gridStack/case_widget.dart';
+import 'package:clean_temp/widget/gridStack/animated_path_layer.dart';
+import 'package:clean_temp/widget/gridStack/error_gesture_gestion.dart';
+import 'package:clean_temp/widget/gridStack/static_background_grid.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class GridBanner extends ConsumerWidget {
+class GridBanner extends StatelessWidget {
   final LevelModel level;
   const GridBanner({super.key, required this.level});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final provid = ref.watch(
-      gameManagerProvider(
-        level,
-      ).select((s) => (s.dataPainting, s.roadList, s.animationProgress)),
-    );
-
+  Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (contex, constraints) {
         final sizeGrid = constraints.biggest.shortestSide * 0.95;
@@ -27,30 +21,15 @@ class GridBanner extends ConsumerWidget {
             child: Stack(
               children: [
                 // Grille de fond
-                GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: level.size,
-                  ),
-                  itemCount: level.size * level.size,
-                  itemBuilder: (context, index) => Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey, width: 0.5),
-                    ),
-                  ),
-                ),
+                StaticBackgroundGrid(levelSize: level.size),
                 //  Dessin du shéma
-                  RepaintBoundary(
-                    child: CustomPaint(
-                      size: Size(sizeGrid, sizeGrid),
-                      painter: PathPainter(
-                        level: level,
-                        provid: provid,
-                      ),
-                    ),
-                  ),
+                AnimatedPathLayer(level: level, sizeGrid: sizeGrid),
+
+            
                 // dessin des cases
                 CaseWidget(level: level),
+                    // Erreur et geste
+                ErrorGestureGestion(level: level),
               ],
             ),
           ),
