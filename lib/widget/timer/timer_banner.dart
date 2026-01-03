@@ -1,0 +1,159 @@
+import 'package:clean_temp/data/constants.dart';
+import 'package:clean_temp/data/enum.dart';
+import 'package:clean_temp/models/level/level_model.dart';
+import 'package:clean_temp/services/game_manager.dart';
+import 'package:clean_temp/widget/timer/format_time.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class TimerBanner extends ConsumerStatefulWidget {
+  final LevelModel level;
+  const TimerBanner({super.key, required this.level});
+
+  @override
+  ConsumerState<TimerBanner> createState() => _TimerBannerState();
+}
+
+class _TimerBannerState extends ConsumerState<TimerBanner>
+    with SingleTickerProviderStateMixin {
+  late AnimationController controller;
+
+  int dureeMax = 60;
+  double ratio = 1;
+
+  int initCompteurValue = 0;
+
+  bool pauseAction = false;
+  int currentDuration = 0;
+  int timeValue = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: dureeMax),
+      value: 0,
+    );
+
+    controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        initCompteurValue = timeValue;
+        final notifier = ref.read(gameManagerProvider(widget.level).notifier);
+        notifier.canUseBonus();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen(
+      gameManagerProvider(widget.level).select((s) => (s.timerState)),
+      (previous, next) {
+        if (previous == TimerAction.init && next == TimerAction.play) {
+          dureeMax = ref
+              .read(gameManagerProvider(widget.level).notifier)
+              .maxCurrentValue;
+
+          controller.duration = Duration(seconds: dureeMax);
+
+          controller.forward();
+        } else if (next == TimerAction.win) {
+          controller.stop();
+          ref
+              .read(gameManagerProvider(widget.level).notifier)
+              .finishGame(timeValue);
+        } else if (previous == TimerAction.pause && next == TimerAction.play) {
+          controller.forward();
+        } else if (next == TimerAction.pause || previous == TimerAction.stop) {
+          controller.stop();
+        } else if (previous == TimerAction.stop &&
+            next == TimerAction.addTime) {
+          controller.duration = Duration(seconds: Constants.TIME_ADD_SECONDS);
+          controller.value = 0;
+          controller.forward();
+        }
+      },
+    );
+
+    return SizedBox(
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: 40,
+              margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black, width: 2),
+                borderRadius: BorderRadius.circular(5),
+                gradient: LinearGradient(
+                  colors: const [
+                    Colors.green,
+                    Colors.yellow,
+                    Colors.orange,
+                    Colors.red,
+                  ],
+                ),
+              ),
+
+              child: AnimatedBuilder(
+                animation: controller,
+                builder: (context, child) {
+                  // print(controller.value);
+                  currentDuration = controller.duration?.inSeconds ?? 0;
+                  timeValue =
+                      initCompteurValue +
+                      ((controller.value) * currentDuration).floor();
+
+                  return Stack(
+                    children: [
+                      // Le dégradé qui se vide
+                      FractionallySizedBox(
+                        alignment:
+                            Alignment.centerLeft, // Le masque démarre à gauche
+                        widthFactor:
+                            controller.value, // Il grandit quand le temps passe
+                        child: Container(
+                          color:
+                              Colors.white, // Ou la couleur de ton fond d'écran
+                        ),
+                      ),
+                      // Le texte par-dessus
+                      Center(child: formatTime(timeValue)),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: () {
+              pauseAction
+                  ? ref
+                        .read(gameManagerProvider(widget.level).notifier)
+                        .resumeTime()
+                  : {
+                      ref
+                          .read(gameManagerProvider(widget.level).notifier)
+                          .pauseTime(),
+                    };
+              setState(() {
+                pauseAction = !pauseAction;
+              });
+            },
+            icon: pauseAction
+                ? Icon(Icons.play_circle)
+                : Icon(Icons.pause_circle_filled),
+          ),
+        ],
+      ),
+    );
+  }
+}

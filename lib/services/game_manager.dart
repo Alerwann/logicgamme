@@ -22,26 +22,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 ///
 class GameManager extends StateNotifier<SessionState> {
   final Ref _ref;
-
-  Timer? _timer;
   Timer? _waitDiff;
   Timer? _waitDraw;
 
-  int _tempsEcoule = 0;
-  int get tempsEcoule => _tempsEcoule;
+  late SessionState _result;
 
   int _maxCurrentValue = Constants.DURATION_NORMAL_MODE;
   int get maxCurrentValue => _maxCurrentValue;
-
-  double _ratioTime = 1;
-  double get ratioTime => _ratioTime;
 
   Set<CaseModel> _errorSetCase = {};
   Set<CaseModel> get errorSetCase => _errorSetCase;
 
   final HiveService _hiveService;
   final MoneyService _moneyService;
-
   final MoveManagerService _moveManageService;
 
   ///initialisation de la classe
@@ -97,67 +90,34 @@ class GameManager extends StateNotifier<SessionState> {
     );
   }
 
-  /// Lancement du timer de la partie
-  /// Il demarre au premier toucher
-  /// Quand le compteur est à 0 :
-  ///   - il est arrété
-  ///   - passe en waitAddtime qui vérifie
-  ///   - si assez pour acheté passe l'état en chooseAddtime pour déclancé un popup de choix
-  ///   - si pas assez passe l'état en loose pour signaler la perte de la partie
+  /// Vérification de la possibiliter de prendre un bonus de temps
+  /// appelé par timeBanner en fin de timer
 
-  void _startTimer() {
-    print("$_maxCurrentValue est la durée du timer");
-    state = state.copyWith(timerState: TimerAction.play);
-
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _tempsEcoule = _tempsEcoule + 1;
-
-      state = state.copyWith(actualValue: _tempsEcoule);
-
-      if (_tempsEcoule == _maxCurrentValue) {
-        timer.cancel();
-
-        // le temps additionnel existe uniquement si le temps est consommé en entier + bonus
-        // réinitialisation de la barre à vide
-        state = state.copyWith(
-          timerState: TimerAction.stop,
-          statutPartie: EtatGame.waitAddTime,
-        );
-
-        final chekBonus = _moneyService.canUseBonus(
-          state.moneyData,
-          TypeBonus.bonusTime,
-        );
-        if (chekBonus) {
-          //lancement du popup et traitement de la rep
-          state = state.copyWith(statutPartie: EtatGame.chooseAddTime);
-        } else {
-          state = state.copyWith(statutPartie: EtatGame.loose);
-        }
-      }
-    });
+  void canUseBonus() {
+    final chekBonus = _moneyService.canUseBonus(
+      state.moneyData,
+      TypeBonus.bonusTime,
+    );
+    if (chekBonus) {
+      //lancement du popup et traitement de la rep
+      state = state.copyWith(statutPartie: EtatGame.chooseAddTime);
+    } else {
+      state = state.copyWith(statutPartie: EtatGame.loose);
+    }
   }
 
   /// fonction de mise en pause du timer sur demande du joueur
   ///
   /// passe l'état de la partie en pause
   void pauseTime() {
-    _timer?.cancel();
-    state = state.copyWith(
-      statutPartie: EtatGame.pause,
-      timerState: TimerAction.pause,
-    );
+    state = state.copyWith(statutPartie: EtatGame.pause);
   }
 
   /// Permet de redémarrer le timer après une pause
   ///
   /// repasse la partie en isPalaying
   void resumeTime() {
-    if (state.statutPartie == EtatGame.pause) {
-      _startTimer();
-      _ratioTime = _maxCurrentValue != 0 ? _tempsEcoule / _maxCurrentValue : 1;
-      state = state.copyWith(statutPartie: EtatGame.isPlaying);
-    }
+    state = state.copyWith(statutPartie: EtatGame.isPlaying);
   }
 
   /// Gestion du timer de l'animation du dessin
@@ -197,7 +157,6 @@ class GameManager extends StateNotifier<SessionState> {
   /// Permet le nettoyage des contrôleurs
   @override
   void dispose() {
-    _timer?.cancel();
     _waitDiff?.cancel();
     _waitDraw?.cancel();
     super.dispose();
@@ -205,15 +164,19 @@ class GameManager extends StateNotifier<SessionState> {
 
   //gestion des scores de fin de partie
 
+  void finishGame(int timeGame) async {
+    print("Sauvegarde de win");
+    await _saveRecord(timeGame);
+    await _saveWinGame();
+    _startAnimationTimer(EtatGame.win, _result);
+  }
+
   /// Après vérification si le record est battut, envoie de la demande de sauvegarde
   ///
-  Future<void> _saveRecord(LevelModel level) async {
-    if (level.bestRecordNormalSeconds > _tempsEcoule) {
+  Future<void> _saveRecord(int timeGame) async {
+    if (state.levelConfig.bestRecordNormalSeconds > timeGame) {
       try {
-        await _hiveService.saveRecord(level.levelId, _tempsEcoule);
-
-        _ref.read(messageProvider.notifier).state =
-            "Nouveau record de $_tempsEcoule secondes sauvegardé !";
+        await _hiveService.saveRecord(state.levelConfig.levelId, timeGame);
       } catch (e) {
         _ref.read(messageProvider.notifier).state =
             "Erreur lors de la sauvegarde du record. Contacter le support.";
@@ -223,7 +186,7 @@ class GameManager extends StateNotifier<SessionState> {
       }
     } else {
       _ref.read(messageProvider.notifier).state =
-          "Bravo ! Record non battu (actuel: ${level.bestRecordNormalSeconds}s)";
+          "Bravo ! Record non battu (actuel: ${state.levelConfig.bestRecordNormalSeconds}s)";
     }
   }
 
@@ -238,8 +201,6 @@ class GameManager extends StateNotifier<SessionState> {
       );
       if (returnState.isDo) {
         state = state.copyWith(moneyData: returnState.state);
-        _ref.read(messageProvider.notifier).state =
-            "Bravo! Vos récompenses sont à jour";
       } else {
         _ref.read(messageProvider.notifier).state =
             "Le gain n'a pas pu être sauvegardé pour défaut de mémoire.";
@@ -259,15 +220,18 @@ class GameManager extends StateNotifier<SessionState> {
   /// Sinon retour comme quoi le tableau n'est pas remplis
 
   void _checkEndGame(SessionState result) async {
-    _timer?.cancel();
-    if (state.roadSet.length == state.levelConfig.cases.length) {
-      await _saveRecord(state.levelConfig);
-      await _saveWinGame();
-
-      _startAnimationTimer(EtatGame.win, result);
-    }
-    {
-      _errorSetCase = state.levelConfig.cases.toSet().difference(state.roadSet.toSet());
+    print(
+      "checkAndgame. : ${result.roadList.length} =? ${state.levelConfig.cases.length}",
+    );
+    if (result.roadList.length == state.levelConfig.cases.length) {
+      print("gagné");
+      state = state.copyWith(timerState: TimerAction.win);
+      print(state.timerState);
+      _result = result;
+    } else {
+      _errorSetCase = state.levelConfig.cases.toSet().difference(
+        state.roadSet.toSet(),
+      );
       state = state.copyWith(
         statutPartie: EtatGame.isPlaying,
         error: ErrorPlayer.other,
@@ -314,8 +278,8 @@ class GameManager extends StateNotifier<SessionState> {
     final newState = result.sessionState;
 
     if (codeFeedback == MoveStatusCode.success) {
-      if (_tempsEcoule == 0) {
-        _startTimer();
+      if (state.timerState == TimerAction.init) {
+        state = state.copyWith(timerState: TimerAction.play);
       }
       _startAnimationTimer(EtatGame.isPlaying, newState);
     } else if (codeFeedback == MoveStatusCode.successlastTagCheck) {
@@ -415,15 +379,12 @@ class GameManager extends StateNotifier<SessionState> {
         );
 
         if (resultBuy.isDo) {
-          _maxCurrentValue = _tempsEcoule + Constants.TIME_ADD_SECONDS;
-          _ratioTime = 1;
-
           state = state.copyWith(
             moneyData: resultBuy.state,
             difficultyMode: TypeDifficulty.normal,
             statutPartie: EtatGame.isPlaying,
+            timerState: TimerAction.addTime,
           );
-          _startTimer();
         }
       } catch (e) {
         if (kDebugMode) {

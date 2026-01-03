@@ -2,7 +2,7 @@ import 'package:clean_temp/models/case/case_model.dart';
 import 'package:clean_temp/models/data_for_painting.dart';
 import 'package:clean_temp/models/level/level_model.dart';
 import 'package:clean_temp/utils/calcul_coordonnee.dart';
-import 'package:clean_temp/widget/gridStack/animated_path_layer.dart';
+import 'package:clean_temp/widget/gridbanner/path%20draw/animated_path_layer.dart';
 import 'package:flutter/material.dart';
 
 class PathPainter extends CustomPainter {

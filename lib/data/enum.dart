@@ -88,4 +88,4 @@ enum CodeLevelGenerator {
   levelNotExist,
 }
 
-enum TimerAction { play, pause, stop, addTime, backToPause, init }
+enum TimerAction { play, pause, stop, addTime, win, init }

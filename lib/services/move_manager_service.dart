@@ -7,12 +7,11 @@ import 'package:clean_temp/models/session_state.dart';
 /// Service de gestion et vérification des mouvements pendant le jeu
 
 class MoveManagerService {
-
-  /// Fonction d'annulation 
+  /// Fonction d'annulation
   /// Le cas case appuye est la dernière est exclus
   /// Renvoie que le nouvel état à jour
 
-    SessionState cancelMove(SessionState state, CaseModel newCase) {
+  SessionState cancelMove(SessionState state, CaseModel newCase) {
     final index = state.roadList.indexOf(newCase);
     final newRoad = state.roadList.sublist(0, index + 1);
 
@@ -31,6 +30,7 @@ class MoveManagerService {
     );
     return newState;
   }
+
   /// fonciton d'entrée de mouvement
   ///
   /// A chaque tentative de mouvement cette fonction est appelée
@@ -42,9 +42,9 @@ class MoveManagerService {
   ///
   /// Retourne un MoveResult :
   /// le statut d'aboutissement du mouvement , l'état modifié si réussite sinon l'état initial , la case qui a posé erreur si nécessaire
-  /// 
-  /// 
-  /// 
+  ///
+  ///
+  ///
   MoveResult handleMove(SessionState state, CaseModel newCase) {
     final CaseModel lastCase = state.roadList.last;
 
@@ -299,6 +299,7 @@ class MoveManagerService {
         if (cases.numberTag == temporyTag + 1) {
           temporyTag = cases.numberTag!;
         } else {
+      
           return ResultOrderTag(
             goodOrder: false,
             lastTag: lastTagSave,

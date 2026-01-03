@@ -1,6 +1,6 @@
 import 'package:clean_temp/models/level/level_model.dart';
-import 'package:clean_temp/widget/grid_banner.dart';
-import 'package:clean_temp/widget/timer_banner.dart';
+import 'package:clean_temp/widget/gridbanner/grid_banner.dart';
+import 'package:clean_temp/widget/timer/timer_banner.dart';
 import 'package:clean_temp/widget/top_banner_widget.dart';
 import 'package:flutter/material.dart';
 

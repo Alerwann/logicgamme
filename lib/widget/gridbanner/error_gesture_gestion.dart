@@ -11,18 +11,14 @@ class ErrorGestureGestion extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     BoxDecoration deco = BoxDecoration();
 
-    Set<CaseModel> errorCases ={};
+    Set<CaseModel> errorCases = {};
 
     Border borderFinal = Border.all(
       color: const Color.fromARGB(255, 255, 0, 0),
       width: 5,
     );
- 
-
-    final error = ref.watch(gameManagerProvider(level).select((s) => s.error));
     Border borderWallError(CaseModel errorCase) {
       return Border(
         bottom: errorCase.wallH != null
@@ -34,14 +30,15 @@ class ErrorGestureGestion extends ConsumerWidget {
       );
     }
 
-    if (error == ErrorPlayer.wall || error == ErrorPlayer.other ) {
+    final error = ref.watch(gameManagerProvider(level).select((s) => s.error));
+
+    if (error == ErrorPlayer.wall || error == ErrorPlayer.other) {
       errorCases = ref.read(gameManagerProvider(level).notifier).errorSetCase;
 
       borderFinal = error == ErrorPlayer.wall
           ? borderWallError(errorCases.first)
           : Border.all(color: const Color.fromARGB(255, 255, 0, 0), width: 5);
-    } 
-
+    }
 
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
@@ -55,7 +52,7 @@ class ErrorGestureGestion extends ConsumerWidget {
         bool testCaseError = errorCases.contains(levelCaseData);
 
         deco = BoxDecoration(
-          color:testCaseError ? const Color.fromARGB(98, 244, 67, 54) :null,
+          color: testCaseError ? const Color.fromARGB(98, 244, 67, 54) : null,
           border: testCaseError ? borderFinal : null,
         );
 
