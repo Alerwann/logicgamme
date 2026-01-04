@@ -2,7 +2,7 @@ import 'package:clean_temp/data/constants.dart';
 import 'package:clean_temp/data/enum.dart';
 import 'package:clean_temp/models/level/level_model.dart';
 import 'package:clean_temp/services/game_manager.dart';
-import 'package:clean_temp/widget/timer/format_time.dart';
+import 'package:clean_temp/widget/gamepage/timer/format_time.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

@@ -1,8 +1,8 @@
 import 'package:clean_temp/models/level/level_model.dart';
-import 'package:clean_temp/widget/gridbanner/case_widget.dart';
-import 'package:clean_temp/widget/gridbanner/path%20draw/animated_path_layer.dart';
-import 'package:clean_temp/widget/gridbanner/error_gesture_gestion.dart';
-import 'package:clean_temp/widget/gridbanner/static_background_grid.dart';
+import 'package:clean_temp/widget/gamepage/gridbanner/case_widget.dart';
+import 'package:clean_temp/widget/gamepage/path%20draw/animated_path_layer.dart';
+import 'package:clean_temp/widget/gamepage/gridbanner/error_gesture_gestion.dart';
+import 'package:clean_temp/widget/gamepage/gridbanner/static_background_grid.dart';
 import 'package:flutter/material.dart';
 
 class GridBanner extends StatelessWidget {

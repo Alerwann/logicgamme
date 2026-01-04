@@ -1,4 +1,3 @@
-//botom bar et pages seroint crées ici exemple après
 import 'package:clean_temp/models/case/case_model.dart';
 import 'package:clean_temp/models/level/level_model.dart';
 import 'package:clean_temp/pages/game_page.dart';
