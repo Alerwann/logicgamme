@@ -12,9 +12,9 @@ import 'package:flutter/foundation.dart';
 ///
 
 class SessionState {
-  /// Model du niveau joué
+  /// Model du niveau joué Pour tous
   final LevelModel levelConfig;
-
+  //game
   /// List des cases qui ont été parcouru par le joueur
   /// Est initialisé avec [firstCase] du [levelConfig]
   final List<CaseModel> roadList;
@@ -30,11 +30,16 @@ class SessionState {
   /// Définit les état de la partie (définition précise de chaque état dans l'énum)
   final EtatGame statutPartie;
 
+  //gestionde la monaie
   /// Définit si la partie est en mode Normal ou Hard
   final TypeDifficulty difficultyMode;
 
   /// Définit l'état des monnaies
   final MoneyModel moneyData;
+
+
+
+  //Animation
 
   /// Les offsets pour la création du dessin
   final CoordForPainting? dataPainting;
@@ -42,11 +47,17 @@ class SessionState {
   /// Variable indiquant la progression de l'animation
   final double? animationProgress;
 
-  final int actualValue;
-
+  // timer
+  /// Variable indiquant l'état que doit suivre le timer
   final TimerAction timerState;
 
+  //affichage erreur
+  /// Variable indiquant le type d'erreur pour l'ui
   final ErrorPlayer error;
+
+  //choix de page
+  ///Variable indiquant si le jeu est en cours ou s'il est gagné ou perdu
+  final StateGamePage stateGamePage;
 
   SessionState({
     required this.levelConfig,
@@ -56,19 +67,18 @@ class SessionState {
     required this.statutPartie,
     required this.difficultyMode,
     required this.moneyData,
-
     // animation du chemin
     this.dataPainting,
     this.animationProgress,
-
-    // animation du timer
-    required this.actualValue,
 
     // déclanchement animation
     required this.timerState,
 
     // déclanche les erreurs
     required this.error,
+
+    // déclanche l'affiche de jeu ou de la fin
+    required this.stateGamePage,
   });
 
   ///Utilise la copy pour te pas casser l'immuabilité du modèle
@@ -80,14 +90,12 @@ class SessionState {
     EtatGame? statutPartie,
     TypeDifficulty? difficultyMode,
     MoneyModel? moneyData,
-
+    (bool, bool)? canBuyTimeDiff,
     CoordForPainting? dataPainting,
     double? animationProgress,
-
-    int? actualValue,
     TimerAction? timerState,
-
     ErrorPlayer? error,
+    StateGamePage? stateGamePage,
   }) {
     return SessionState(
       levelConfig: levelConfig ?? this.levelConfig,
@@ -97,14 +105,11 @@ class SessionState {
       statutPartie: statutPartie ?? this.statutPartie,
       difficultyMode: difficultyMode ?? this.difficultyMode,
       moneyData: moneyData ?? this.moneyData,
-
       dataPainting: dataPainting,
       animationProgress: animationProgress,
-
-      actualValue: actualValue ?? this.actualValue,
       timerState: timerState ?? this.timerState,
-
       error: error ?? this.error,
+      stateGamePage: stateGamePage ?? this.stateGamePage,
     );
   }
 
@@ -126,9 +131,9 @@ class SessionState {
           moneyData == other.moneyData &&
           dataPainting == other.dataPainting &&
           animationProgress == other.animationProgress &&
-          actualValue == other.actualValue &&
           timerState == other.timerState &&
-          error == other.error;
+          error == other.error &&
+          stateGamePage == other.stateGamePage;
 
   @override
   int get hashCode => Object.hash(
@@ -140,8 +145,8 @@ class SessionState {
     moneyData,
     dataPainting,
     animationProgress,
-    actualValue,
     timerState,
     error,
+    stateGamePage,
   );
 }

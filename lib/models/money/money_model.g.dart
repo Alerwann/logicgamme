@@ -18,24 +18,30 @@ class MoneyModelAdapter extends TypeAdapter<MoneyModel> {
     };
     return MoneyModel(
       bestLevel: fields[0] as int,
-      bonusDaily: fields[1] as int,
-      gemeStock: fields[2] as int,
-      freeHardBonus: fields[3] as int,
+      gemeStock: fields[1] as int,
+      timeBonus: fields[2] as BonusDef,
+      difficultyBonus: fields[3] as BonusDef,
+      canUseBonusTime: fields[4] as bool,
+      canUseBonusDifficulty: fields[5] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, MoneyModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.bestLevel)
       ..writeByte(1)
-      ..write(obj.bonusDaily)
-      ..writeByte(2)
       ..write(obj.gemeStock)
+      ..writeByte(2)
+      ..write(obj.timeBonus)
       ..writeByte(3)
-      ..write(obj.freeHardBonus);
+      ..write(obj.difficultyBonus)
+      ..writeByte(4)
+      ..write(obj.canUseBonusTime)
+      ..writeByte(5)
+      ..write(obj.canUseBonusDifficulty);
   }
 
   @override

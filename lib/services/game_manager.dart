@@ -46,12 +46,8 @@ class GameManager extends StateNotifier<SessionState> {
     this._moveManageService, {
     required MoneyModel initialMoney,
   }) : super(_calculerEtatInitial(levelPlaying, initialMoney)) {
-    final bonusBuyValidation = _moneyService.canUseBonus(
-      initialMoney,
-      TypeBonus.bonusDifficulty,
-    );
-
-    if (bonusBuyValidation) {
+    // vérificaiton de sécurité
+    if (!initialMoney.canUseBonusDifficulty) {
       state = state.copyWith(statutPartie: EtatGame.waitDifficulty);
       _stratWaitingDifficulty();
     } else {
@@ -74,9 +70,9 @@ class GameManager extends StateNotifier<SessionState> {
       statutPartie: EtatGame.loading,
       difficultyMode: TypeDifficulty.normal,
       moneyData: money,
-      actualValue: 0,
       timerState: TimerAction.init,
       error: ErrorPlayer.none,
+      stateGamePage: StateGamePage.playing,
     );
   }
 
@@ -94,15 +90,12 @@ class GameManager extends StateNotifier<SessionState> {
   /// appelé par timeBanner en fin de timer
 
   void canUseBonus() {
-    final chekBonus = _moneyService.canUseBonus(
-      state.moneyData,
-      TypeBonus.bonusTime,
-    );
-    if (chekBonus) {
+
+    if (state.moneyData.canUseBonusTime) {
       //lancement du popup et traitement de la rep
       state = state.copyWith(statutPartie: EtatGame.chooseAddTime);
     } else {
-      state = state.copyWith(statutPartie: EtatGame.loose);
+      state = state.copyWith(stateGamePage: StateGamePage.loose);
     }
   }
 
@@ -126,7 +119,7 @@ class GameManager extends StateNotifier<SessionState> {
   /// Paramètre :
   /// [endState] est l'état de la partie après l'animation soit en jeu soit en victoire
   /// [result] est l'état de la session après la vérification pour mettre à jour la route finale après l'animation
-  void _startAnimationTimer(EtatGame endState, SessionState result) {
+  void _startAnimationTimer(bool win, SessionState result) {
     const int tickMs = 20;
     double progress = 0;
 
@@ -144,12 +137,17 @@ class GameManager extends StateNotifier<SessionState> {
         );
       } else {
         timer.cancel();
-
-        state = result.copyWith(
-          animationProgress: null,
-          dataPainting: null,
-          statutPartie: endState,
-        );
+        state = win
+            ? result.copyWith(
+                animationProgress: null,
+                dataPainting: null,
+                stateGamePage: StateGamePage.win,
+              )
+            : state = result.copyWith(
+                animationProgress: null,
+                dataPainting: null,
+                statutPartie: EtatGame.isPlaying,
+              );
       }
     });
   }
@@ -168,7 +166,7 @@ class GameManager extends StateNotifier<SessionState> {
     print("Sauvegarde de win");
     await _saveRecord(timeGame);
     await _saveWinGame();
-    _startAnimationTimer(EtatGame.win, _result);
+    _startAnimationTimer(true, _result);
   }
 
   /// Après vérification si le record est battut, envoie de la demande de sauvegarde
@@ -281,7 +279,7 @@ class GameManager extends StateNotifier<SessionState> {
       if (state.timerState == TimerAction.init) {
         state = state.copyWith(timerState: TimerAction.play);
       }
-      _startAnimationTimer(EtatGame.isPlaying, newState);
+      _startAnimationTimer(false, newState);
     } else if (codeFeedback == MoveStatusCode.successlastTagCheck) {
       _checkEndGame(newState);
     } else
@@ -370,7 +368,7 @@ class GameManager extends StateNotifier<SessionState> {
   ///
   Future<void> addTimechoose(bool chooseTime) async {
     if (!chooseTime) {
-      state = state.copyWith(statutPartie: EtatGame.loose);
+      state = state.copyWith(stateGamePage: StateGamePage.loose);
     } else {
       try {
         final resultBuy = await _moneyService.buyBonus(
@@ -390,7 +388,7 @@ class GameManager extends StateNotifier<SessionState> {
         if (kDebugMode) {
           print("Erreur lors du changement de difficultées : $e");
         }
-        state = state.copyWith(statutPartie: EtatGame.loose);
+        state = state.copyWith(stateGamePage: StateGamePage.loose);
         _ref.read(messageProvider.notifier).state =
             "Achat du temps non finalisée, la partie est terminée";
       }
@@ -398,8 +396,8 @@ class GameManager extends StateNotifier<SessionState> {
   }
 }
 
-/// Définission du provider de gameManager
-///
+// /// Définission du provider de gameManager
+// ///
 final gameManagerProvider =
     StateNotifierProvider.family<GameManager, SessionState, LevelModel>((
       ref,

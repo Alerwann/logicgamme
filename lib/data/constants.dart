@@ -1,5 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
+import 'package:clean_temp/data/enum.dart';
+
 class Constants {
   static const String levelBox = 'levelsBox';
   static const String moneyBox = 'moneyBox';
@@ -7,6 +9,10 @@ class Constants {
   static const int DURATION_PREVIEW_LEVEL = 10;
   static const int DURATION_DRAWING_MS = 500;
 
+  static const List<TypeBonus> bonusList = [
+    TypeBonus.bonusTime,
+    TypeBonus.bonusDifficulty,
+  ];
 
   //MODE NORMAL
 

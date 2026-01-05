@@ -1,3 +1,6 @@
+import 'package:clean_temp/data/classe%20utils/bonus_validation.dart';
+import 'package:clean_temp/data/constants.dart';
+import 'package:clean_temp/data/enum.dart';
 import 'package:hive/hive.dart';
 
 part 'money_model.g.dart';
@@ -12,63 +15,97 @@ class MoneyModel extends HiveObject {
   @HiveField(1)
   /// Bonus quotidien qui permet un ajout de temps au chronomètre
   /// 3 bonus parjours sont offerts -> si non utilisés ils ne sont pas reportés
-  int bonusDaily;
+  int gemeStock;
+
   @HiveField(2)
   /// Les gemes sont la monaie permanente du jeu et s'acquière à chaque niveau
-  int gemeStock;
+  BonusDef timeBonus;
   @HiveField(3)
   /// 1 fois par jour le joueur peut échouer gratuitement à un mode HARD
-  int freeHardBonus;
+  BonusDef difficultyBonus;
+  @HiveField(4)
+  bool canUseBonusTime;
+  @HiveField(5)
+  bool canUseBonusDifficulty;
 
   MoneyModel({
     required this.bestLevel,
-    required this.bonusDaily,
     required this.gemeStock,
-    required this.freeHardBonus,
+    required this.timeBonus,
+    required this.difficultyBonus,
+    required this.canUseBonusTime,
+    required this.canUseBonusDifficulty,
   });
 
-/// Stock par défaut de bonus et argent virtuel
-/// 
+  /// Stock par défaut de bonus et argent virtuel
+  ///
   factory MoneyModel.initial() {
     return MoneyModel(
       bestLevel: 0,
-      bonusDaily: 3,
       gemeStock: 0,
-      freeHardBonus: 0,
-      // freeHardBonus: 1,
+      difficultyBonus: BonusDef(
+        nameBonus: TypeBonus.bonusDifficulty,
+        costForBuy: Constants.COUT_HARD_ACHAT,
+        quantity: 1,
+        gain: Constants.GAIN_HARD_BONUS,
+      ),
+      timeBonus: BonusDef(
+        nameBonus: TypeBonus.bonusTime,
+        costForBuy: Constants.COUT_ADD_TIME,
+        quantity: 3,
+        gain: Constants.TIME_ADD_SECONDS,
+      ),
+      canUseBonusTime: true,
+      canUseBonusDifficulty: true,
     );
   }
-///Utilise la copy pour te pas casser l'immuabilité du modèle
+
+  ///Utilise la copy pour te pas casser l'immuabilité du modèle
   MoneyModel copyWith({
     int? bestLevel,
-    int? bonusDaily,
     int? gemeStock,
-    int? freeHardBonus,
+
+    BonusDef? timeBonus,
+
+    BonusDef? difficultyBonus,
+    bool? canUseBonusTime,
+    bool? canUseBonusDifficulty,
   }) {
     return MoneyModel(
       bestLevel: bestLevel ?? this.bestLevel,
-      bonusDaily: bonusDaily ?? this.bonusDaily,
       gemeStock: gemeStock ?? this.gemeStock,
-      freeHardBonus: freeHardBonus ?? this.freeHardBonus,
+      difficultyBonus: difficultyBonus ?? this.difficultyBonus,
+      timeBonus: timeBonus ?? this.timeBonus,
+      canUseBonusTime: canUseBonusTime ?? this.canUseBonusTime,
+      canUseBonusDifficulty:
+          canUseBonusDifficulty ?? this.canUseBonusDifficulty,
     );
   }
 
-
-/// Compare 2 [MoneyModel] par leur valeurs
-/// retourne vrai si le meilleur niveau, la quantité de bonus et de monaie sont identique
-/// 
+  /// Compare 2 [MoneyModel] par leur valeurs
+  /// retourne vrai si le meilleur niveau, la quantité de bonus et de monaie sont identique
+  ///
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is MoneyModel &&
           runtimeType == other.runtimeType &&
           bestLevel == other.bestLevel &&
-          bonusDaily == other.bonusDaily &&
+          timeBonus == other.timeBonus &&
           gemeStock == other.gemeStock &&
-          freeHardBonus == other.freeHardBonus;
+          difficultyBonus == other.difficultyBonus &&
+          timeBonus == other.timeBonus &&
+          canUseBonusTime == other.canUseBonusTime &&
+          canUseBonusDifficulty==other.canUseBonusDifficulty;
 
   /// Génère une clé de hachage basée sur l'ensemble des propriétés de la case.
   @override
-  int get hashCode =>
-      Object.hash(bestLevel, bonusDaily, gemeStock, freeHardBonus);
+  int get hashCode => Object.hash(
+    bestLevel,
+    timeBonus,
+    gemeStock,
+    difficultyBonus,
+    timeBonus,
+    canUseBonusTime,canUseBonusDifficulty,
+  );
 }

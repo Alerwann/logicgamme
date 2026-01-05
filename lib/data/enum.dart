@@ -35,6 +35,8 @@ enum EtatGame {
   waitVerifRoad,
 }
 
+enum StateGamePage { playing, win, loose}
+
 enum MoveStatusCode {
   /// Si le mouvement n'a pas eu d'obstacle
   success,

@@ -9,7 +9,7 @@ class TopBannerWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(gameManagerProvider(level).select((s)=>(s.moneyData, s.levelConfig)));
+    final provider = ref.watch(gameManagerProvider(level).select((s)=>(s.moneyData,)));
     return Container(
       height: 200,
       padding: EdgeInsets.only(top: 20),
@@ -25,7 +25,7 @@ class TopBannerWidget extends ConsumerWidget {
                 spacing: 10,
                 children: [
                   Text(
-                    "Niveau : ${provider.$2.levelId}",
+                    "Niveau : ${level.levelId}",
                     style: TextTheme.of(context).displayMedium,
                   ),
                   Expanded(
@@ -57,7 +57,7 @@ class TopBannerWidget extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  provider.$1.bonusDaily.toString(),
+                                  provider.$1.timeBonus.quantity.toString(),
                                   style: TextTheme.of(context).titleLarge,
                                 ),
                                 Image.asset(
@@ -72,7 +72,7 @@ class TopBannerWidget extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  provider.$1.freeHardBonus.toString(),
+                                  provider.$1.difficultyBonus.quantity.toString(),
                                   style: TextTheme.of(context).titleLarge,
                                 ),
                                 Image.asset(

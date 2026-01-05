@@ -1,3 +1,4 @@
+import 'package:clean_temp/data/classe%20utils/bonus_validation.dart';
 import 'package:clean_temp/data/constants.dart';
 import 'package:clean_temp/data/enum.dart';
 import 'package:clean_temp/models/money/money_model.dart';
@@ -13,24 +14,18 @@ class MoneyService {
   ///   [type] définit si le bonus est pour la difficulté ou le temps
   ///
   /// Retourne True si le joueur a de quoi acheter le bonus et false sinon
-  bool canUseBonus(MoneyModel moneystate, TypeBonus type) {
-    int countBonus;
-    int costBonus;
-    switch (type) {
-      case TypeBonus.bonusTime:
-        countBonus = moneystate.bonusDaily;
-        costBonus = Constants.COUT_ADD_TIME;
-        break;
-      case TypeBonus.bonusDifficulty:
-        countBonus = moneystate.freeHardBonus;
-        costBonus = Constants.COUT_HARD_ACHAT;
-        break;
-    }
+  (bool, bool) canAllUseBonus(MoneyModel moneystate) {
+    bool canBuytime;
+    bool canBuyDifficulty;
+    BonusDef time = moneystate.timeBonus;
+    BonusDef diff = moneystate.difficultyBonus;
 
-    if (countBonus > 0 || moneystate.gemeStock >= costBonus) {
-      return true;
-    }
-    return false;
+    canBuyDifficulty =
+        moneystate.gemeStock >= diff.costForBuy || diff.quantity > 0;
+    canBuytime = moneystate.gemeStock >= time.costForBuy || time.quantity > 0;
+
+    (canBuytime, canBuyDifficulty);
+    return (canBuytime, canBuyDifficulty);
   }
 
   /// Fait l'achat et si réalisé sauvegarde le nouvel état
@@ -52,17 +47,8 @@ class MoneyService {
     MoneyModel newState;
 
     /// tentative d'achat
-    final testBuy = testTypeBuyBonus(type, moneyState);
-
-    if (!testBuy.$1) {
-      return ResultActionBonus(
-        isDo: false,
-        statusCode: BuyStatusCode.actionKo,
-        state: moneyState,
-      );
-    } else {
-      newState = testBuy.$2;
-    }
+    final buyAction = testTypeBuyBonus(type, moneyState);
+    newState = buyAction.$1;
 
     /// tentative de sauvegarde
     return await saveMoneyModel(newState, moneyState);
@@ -79,38 +65,53 @@ class MoneyService {
   /// Retourne true et le nouveau modèle si achat réussi
   /// Sinon retourne false et le modèle initial
   ///
-  (bool, MoneyModel) testTypeBuyBonus(TypeBonus type, MoneyModel moneyState) {
-    MoneyModel newState;
-    int countBonus;
-    int costBonus;
+  (MoneyModel, (bool, bool)) testTypeBuyBonus(
+    TypeBonus type,
+    MoneyModel moneyState,
+  ) {
+    BonusDef principalDef;
+    BonusDef secondairDef;
+    (bool, bool) newCanBuy;
+
+    int newGemme = moneyState.gemeStock;
+
+    int quantity;
+    int price;
+    MoneyModel money;
+
+    // définition du type de bonus testé
 
     switch (type) {
       case TypeBonus.bonusTime:
-        countBonus = moneyState.bonusDaily;
-        costBonus = Constants.COUT_ADD_TIME;
-        break;
+        principalDef = moneyState.timeBonus;
+        secondairDef = moneyState.difficultyBonus;
       case TypeBonus.bonusDifficulty:
-        countBonus = moneyState.freeHardBonus;
-        costBonus = Constants.COUT_HARD_ACHAT;
-        break;
+        principalDef = moneyState.difficultyBonus;
+        secondairDef = moneyState.timeBonus;
     }
+    // def des variables
+    quantity = principalDef.quantity;
+    price = principalDef.costForBuy;
+    // si possible d'acheté on fait les modifications
 
-    if (countBonus > 0) {
-      final newCountBonus = countBonus - 1;
-
-      if (type == TypeBonus.bonusTime) {
-        newState = moneyState.copyWith(bonusDaily: newCountBonus);
-      } else {
-        newState = moneyState.copyWith(freeHardBonus: newCountBonus);
-      }
-      return (true, newState);
-    } else if (moneyState.gemeStock >= costBonus) {
-      final newCountGemme = moneyState.gemeStock - costBonus;
-      newState = moneyState.copyWith(gemeStock: newCountGemme);
-      return (true, newState);
+    if (quantity > 0) {
+      quantity = quantity - 1;
+      principalDef = principalDef.copyWith(quantity: quantity);
     } else {
-      return (false, moneyState);
+      newGemme = newGemme - price;
     }
+
+    money = moneyState.copyWith(
+      timeBonus: type == TypeBonus.bonusTime ? principalDef : secondairDef,
+      difficultyBonus: type == TypeBonus.bonusTime
+          ? principalDef
+          : secondairDef,
+      gemeStock: newGemme,
+    );
+    // newCanBuy = canAllUseBonus(money);
+    newCanBuy = (false, false);
+
+    return (money, newCanBuy);
   }
 
   /// Mets à jour [moneyState] suite à une victoire
@@ -193,7 +194,6 @@ class MoneyService {
       await newState.save();
     } catch (e) {
       if (kDebugMode) {
-
         return ResultActionBonus(
           isDo: false,
           statusCode: BuyStatusCode.saveKO,
