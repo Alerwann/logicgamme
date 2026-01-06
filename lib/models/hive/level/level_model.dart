@@ -1,4 +1,4 @@
-import 'package:clean_temp/models/case/case_model.dart';
+import 'package:clean_temp/models/hive/case/case_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 

@@ -17,13 +17,13 @@ class Constants {
   //MODE NORMAL
 
   static const int GAIN_NORMAL = 100;
-  static const int DURATION_NORMAL_MODE = 90;
+  static const int DURATION_NORMAL_MODE = 20;
 
   //BONUS HARD MODE
   static const int DAILY_DIFFICULTY_COUNT = 1;
   static const int GAIN_HARD_BONUS = 250;
   static const int COUT_HARD_ACHAT = 100;
-  static const int DURATION_HARD_MODE = 60;
+  static const int DURATION_HARD_MODE = 10;
 
   // BONUS ADD_TIME
   static const int DAILY_ADDTIME_BONUS_COUN = 3;

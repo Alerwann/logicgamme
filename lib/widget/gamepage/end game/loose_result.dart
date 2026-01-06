@@ -1,10 +1,19 @@
+import 'package:clean_temp/models/hive/level/level_model.dart';
 import 'package:flutter/material.dart';
 
 class LooseResult extends StatelessWidget {
-  const LooseResult({super.key});
+  final LevelModel level;
+  const LooseResult({super.key, required this.level});
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Sorry"),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+      ),
+      body: Center(child: Text('Tu as perdu')),
+    );
   }
 }

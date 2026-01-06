@@ -1,7 +1,7 @@
-import 'package:clean_temp/data/classe%20utils/bonus_validation.dart';
+import 'package:clean_temp/models/models%20utils/bonus_validation.dart';
 import 'package:clean_temp/data/constants.dart';
 import 'package:clean_temp/data/enum.dart';
-import 'package:clean_temp/models/money/money_model.dart';
+import 'package:clean_temp/models/hive/money/money_model.dart';
 import 'package:flutter/foundation.dart';
 
 /// Service permettant de modifier le nombre de bonus et monnaie virtuelle
@@ -47,8 +47,8 @@ class MoneyService {
     MoneyModel newState;
 
     /// tentative d'achat
-    final buyAction = testTypeBuyBonus(type, moneyState);
-    newState = buyAction.$1;
+     newState = testTypeBuyBonus(type, moneyState);
+   
 
     /// tentative de sauvegarde
     return await saveMoneyModel(newState, moneyState);
@@ -65,13 +65,12 @@ class MoneyService {
   /// Retourne true et le nouveau modèle si achat réussi
   /// Sinon retourne false et le modèle initial
   ///
-  (MoneyModel, (bool, bool)) testTypeBuyBonus(
+  MoneyModel testTypeBuyBonus(
     TypeBonus type,
     MoneyModel moneyState,
   ) {
     BonusDef principalDef;
     BonusDef secondairDef;
-    (bool, bool) newCanBuy;
 
     int newGemme = moneyState.gemeStock;
 
@@ -109,9 +108,14 @@ class MoneyService {
       gemeStock: newGemme,
     );
     // newCanBuy = canAllUseBonus(money);
-    newCanBuy = (false, false);
+  
+    final canAllBonus = canAllUseBonus(money);
+    final canBuytime = canAllBonus.$1;
+    final canBuyDifficulty = canAllBonus.$2;
 
-    return (money, newCanBuy);
+    money = money.copyWith(canUseBonusDifficulty: canBuyDifficulty,canUseBonusTime: canBuytime);
+
+    return money;
   }
 
   /// Mets à jour [moneyState] suite à une victoire

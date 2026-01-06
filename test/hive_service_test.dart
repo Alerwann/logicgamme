@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:clean_temp/services/hive_service.dart';
-import 'package:clean_temp/models/level/level_model.dart';
-import 'package:clean_temp/models/case/case_model.dart';
+import 'package:clean_temp/models/hive/level/level_model.dart';
+import 'package:clean_temp/models/hive/case/case_model.dart';
 
 void main() {
   late HiveService hiveService;

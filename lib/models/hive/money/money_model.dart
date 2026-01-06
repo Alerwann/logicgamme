@@ -1,4 +1,4 @@
-import 'package:clean_temp/data/classe%20utils/bonus_validation.dart';
+import 'package:clean_temp/models/models%20utils/bonus_validation.dart';
 import 'package:clean_temp/data/constants.dart';
 import 'package:clean_temp/data/enum.dart';
 import 'package:hive/hive.dart';

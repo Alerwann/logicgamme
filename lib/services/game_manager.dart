@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:clean_temp/data/constants.dart';
 import 'package:clean_temp/data/enum.dart';
-import 'package:clean_temp/models/case/case_model.dart';
-import 'package:clean_temp/models/level/level_model.dart';
-import 'package:clean_temp/models/money/money_model.dart';
-import 'package:clean_temp/models/session_state.dart';
+import 'package:clean_temp/models/hive/case/case_model.dart';
+import 'package:clean_temp/models/hive/level/level_model.dart';
+import 'package:clean_temp/models/hive/money/money_model.dart';
+import 'package:clean_temp/models/tempory/session_state.dart';
 import 'package:clean_temp/providers/hive_service_provider.dart';
 import 'package:clean_temp/providers/message_provider.dart';
 import 'package:clean_temp/providers/money_provider.dart';
@@ -47,7 +47,7 @@ class GameManager extends StateNotifier<SessionState> {
     required MoneyModel initialMoney,
   }) : super(_calculerEtatInitial(levelPlaying, initialMoney)) {
     // vérificaiton de sécurité
-    if (!initialMoney.canUseBonusDifficulty) {
+    if (initialMoney.canUseBonusDifficulty) {
       state = state.copyWith(statutPartie: EtatGame.waitDifficulty);
       _stratWaitingDifficulty();
     } else {
@@ -90,7 +90,7 @@ class GameManager extends StateNotifier<SessionState> {
   /// appelé par timeBanner en fin de timer
 
   void canUseBonus() {
-
+    ///modif en attendant popup
     if (state.moneyData.canUseBonusTime) {
       //lancement du popup et traitement de la rep
       state = state.copyWith(statutPartie: EtatGame.chooseAddTime);
@@ -162,7 +162,7 @@ class GameManager extends StateNotifier<SessionState> {
 
   //gestion des scores de fin de partie
 
-  void finishGame(int timeGame) async {
+  Future<void> finishGame(int timeGame) async {
     print("Sauvegarde de win");
     await _saveRecord(timeGame);
     await _saveWinGame();
@@ -320,17 +320,20 @@ class GameManager extends StateNotifier<SessionState> {
   /// Si echec matien du niveau à normal
   ///
   /// Passage à isPlaying en fin quoi qu'il arrive
-  Future<void> difficultyChoose(bool chooseHard) async {
+  Future<void> _difficultyChoose(bool chooseHard) async {
+    print("Achat du bonus de difficultés");
     if (!chooseHard) {
+      print("j'en veut pas");
       _maxCurrentValue = Constants.DURATION_NORMAL_MODE;
       state = state.copyWith(statutPartie: EtatGame.isPlaying);
     } else {
+      print("j'en veux un");
       try {
         final resultBuy = await _moneyService.buyBonus(
           state.moneyData,
           TypeBonus.bonusDifficulty,
         );
-
+        print("c'est acheté : ${resultBuy.isDo} ${resultBuy.statusCode}");
         if (resultBuy.isDo) {
           _maxCurrentValue = Constants.DURATION_HARD_MODE;
           state = state.copyWith(
@@ -366,7 +369,8 @@ class GameManager extends StateNotifier<SessionState> {
   /// Si echec passage en état loose et envoie du message d'information
   ///
   ///
-  Future<void> addTimechoose(bool chooseTime) async {
+  Future<void> _addTimechoose(bool chooseTime) async {
+    print("Achat du bonus de temps");
     if (!chooseTime) {
       state = state.copyWith(stateGamePage: StateGamePage.loose);
     } else {
@@ -392,6 +396,15 @@ class GameManager extends StateNotifier<SessionState> {
         _ref.read(messageProvider.notifier).state =
             "Achat du temps non finalisée, la partie est terminée";
       }
+    }
+  }
+
+  void bonusAll(TypeBonus bonus, bool addIt) {
+    switch (bonus) {
+      case TypeBonus.bonusTime:
+        _addTimechoose(addIt);
+      case TypeBonus.bonusDifficulty:
+        _difficultyChoose(addIt);
     }
   }
 }

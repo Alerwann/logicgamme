@@ -1,6 +1,6 @@
-import 'package:clean_temp/models/case/case_model.dart';
-import 'package:clean_temp/models/level/level_model.dart';
-import 'package:clean_temp/pages/game_page.dart';
+import 'package:clean_temp/models/hive/case/case_model.dart';
+import 'package:clean_temp/models/hive/level/level_model.dart';
+import 'package:clean_temp/pages/game/game_page.dart';
 import 'package:flutter/material.dart';
 
 class HomeBottomBar extends StatefulWidget {

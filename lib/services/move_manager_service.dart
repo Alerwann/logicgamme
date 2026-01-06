@@ -1,8 +1,8 @@
 import 'package:clean_temp/data/enum.dart';
-import 'package:clean_temp/models/case/case_model.dart';
-import 'package:clean_temp/models/data_for_painting.dart';
-import 'package:clean_temp/models/level/level_model.dart';
-import 'package:clean_temp/models/session_state.dart';
+import 'package:clean_temp/models/hive/case/case_model.dart';
+import 'package:clean_temp/models/models%20utils/data_for_painting.dart';
+import 'package:clean_temp/models/hive/level/level_model.dart';
+import 'package:clean_temp/models/tempory/session_state.dart';
 
 /// Service de gestion et vérification des mouvements pendant le jeu
 

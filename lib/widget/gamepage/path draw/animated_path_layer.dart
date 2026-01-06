@@ -1,6 +1,6 @@
-import 'package:clean_temp/models/case/case_model.dart';
-import 'package:clean_temp/models/data_for_painting.dart';
-import 'package:clean_temp/models/level/level_model.dart';
+import 'package:clean_temp/models/hive/case/case_model.dart';
+import 'package:clean_temp/models/models%20utils/data_for_painting.dart';
+import 'package:clean_temp/models/hive/level/level_model.dart';
 import 'package:clean_temp/services/game_manager.dart';
 import 'package:clean_temp/widget/gamepage/path%20draw/path_painter.dart';
 import 'package:flutter/material.dart';

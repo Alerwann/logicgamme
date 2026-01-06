@@ -1,4 +1,4 @@
-import 'package:clean_temp/models/level/level_model.dart';
+import 'package:clean_temp/models/hive/level/level_model.dart';
 import 'package:clean_temp/widget/gamepage/gridbanner/grid_banner.dart';
 import 'package:clean_temp/widget/gamepage/timer/timer_banner.dart';
 import 'package:clean_temp/widget/gamepage/top_banner_widget.dart';

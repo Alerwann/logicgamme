@@ -1,6 +1,6 @@
 import 'package:clean_temp/data/constants.dart';
 import 'package:clean_temp/data/enum.dart';
-import 'package:clean_temp/models/level/level_model.dart';
+import 'package:clean_temp/models/hive/level/level_model.dart';
 import 'package:clean_temp/services/game_manager.dart';
 import 'package:clean_temp/widget/gamepage/timer/format_time.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +38,8 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
 
     controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        initCompteurValue = timeValue;
+ 
+        initCompteurValue = controller.value.toInt();
         final notifier = ref.read(gameManagerProvider(widget.level).notifier);
         notifier.canUseBonus();
       }
@@ -61,7 +62,7 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
           dureeMax = ref
               .read(gameManagerProvider(widget.level).notifier)
               .maxCurrentValue;
-
+          print(dureeMax);
           controller.duration = Duration(seconds: dureeMax);
 
           controller.forward();
@@ -116,14 +117,9 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
                     children: [
                       // Le dégradé qui se vide
                       FractionallySizedBox(
-                        alignment:
-                            Alignment.centerLeft, // Le masque démarre à gauche
-                        widthFactor:
-                            controller.value, // Il grandit quand le temps passe
-                        child: Container(
-                          color:
-                              Colors.white, // Ou la couleur de ton fond d'écran
-                        ),
+                        alignment: Alignment.centerLeft,
+                        widthFactor: controller.value,
+                        child: Container(color: Colors.white),
                       ),
                       // Le texte par-dessus
                       Center(child: formatTime(timeValue)),

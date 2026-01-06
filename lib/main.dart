@@ -1,14 +1,14 @@
 import 'package:clean_temp/Theme/material_theme.dart';
 import 'package:clean_temp/Theme/text_theme.dart';
 import 'package:clean_temp/data/constants.dart';
-import 'package:clean_temp/models/level/level_model.dart';
-import 'package:clean_temp/models/money/money_model.dart';
+import 'package:clean_temp/models/hive/level/level_model.dart';
+import 'package:clean_temp/models/hive/money/money_model.dart';
 import 'package:clean_temp/pages/home/home_botom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'models/case/case_model.dart';
+import 'models/hive/case/case_model.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

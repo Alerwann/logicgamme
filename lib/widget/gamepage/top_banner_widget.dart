@@ -1,4 +1,4 @@
-import 'package:clean_temp/models/level/level_model.dart';
+import 'package:clean_temp/models/hive/level/level_model.dart';
 import 'package:clean_temp/services/game_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
