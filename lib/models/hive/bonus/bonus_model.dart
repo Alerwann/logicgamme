@@ -1,5 +1,5 @@
-import 'package:logic_game/data/enum.dart';
 import 'package:hive/hive.dart';
+import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
 
 part 'bonus_model.g.dart';
 

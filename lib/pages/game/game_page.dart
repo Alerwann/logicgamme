@@ -1,4 +1,4 @@
-import 'package:logic_game/data/enum.dart';
+import 'package:logic_game/data/enum/enum.dart';
 import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:logic_game/pages/game/game_main_layout.dart';
 import 'package:logic_game/services/game_manager.dart';

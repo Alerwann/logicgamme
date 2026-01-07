@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
 final moneyProvider = Provider<MoneyModel>((ref) {
+  print("init du provider");
   final box = Hive.box<MoneyModel>(Constants.moneyBox);
 
-  return box.isEmpty ? MoneyModel.initial() : box.getAt(0)!;
+  return box.getAt(0)!;
 });

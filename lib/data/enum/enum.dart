@@ -1,5 +1,6 @@
 // Ensemble des enums
 
+
 enum EtatGame {
   /// Chargement initial
   loading,
@@ -35,7 +36,7 @@ enum EtatGame {
   waitVerifRoad,
 }
 
-enum StateGamePage { playing, win, loose}
+enum StateGamePage { playing, win, loose }
 
 enum MoveStatusCode {
   /// Si le mouvement n'a pas eu d'obstacle
@@ -61,7 +62,8 @@ enum ErrorPlayer { wall, other, none, snackbar }
 
 enum TypeMove { vertical, horizontal }
 
-enum TypeBonus { bonusTime, bonusDifficulty }
+
+
 
 enum TypeDifficulty { normal, hard }
 

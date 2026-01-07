@@ -1,6 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
-import 'package:logic_game/data/enum.dart';
+import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
 
 class Constants {
   static const String levelBox = 'levelsBox';

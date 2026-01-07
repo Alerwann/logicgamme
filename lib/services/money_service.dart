@@ -1,12 +1,24 @@
+import 'package:hive/hive.dart';
+import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
 import 'package:logic_game/models/hive/bonus/bonus_model.dart';
 import 'package:logic_game/data/constants.dart';
-import 'package:logic_game/data/enum.dart';
+import 'package:logic_game/data/enum/enum.dart';
 import 'package:logic_game/models/hive/money/money_model.dart';
 
 /// Service permettant de modifier le nombre de bonus et monnaie virtuelle
 ///
 class MoneyService {
-  static void initMoney() {}
+  static void initMoney() async {
+    final moneyBox = Hive.box<MoneyModel>(Constants.moneyBox);
+    print(moneyBox.isEmpty);
+    if (moneyBox.isEmpty) {
+      await moneyBox.put(0, MoneyModel.initial());
+      print("Valeurs de monnaie par défaut installées");
+    } else {
+      final moneyessai = moneyBox.get(0)!.gemeStock;
+      print("moneyessai : $moneyessai");
+    }
+  }
 
   /// gestion de la vérification
   ///
@@ -193,8 +205,10 @@ class MoneyService {
     MoneyModel newState,
     MoneyModel oldState,
   ) async {
+        final moneyBox = Hive.box<MoneyModel>(Constants.moneyBox);
+
     try {
-      await newState.save();
+      await moneyBox.put(0,newState);
     } catch (e) {
       print("erreur de sauvegarde : $e");
       return ResultActionBonus(

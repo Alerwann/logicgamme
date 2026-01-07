@@ -1,6 +1,6 @@
+import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
 import 'package:logic_game/models/hive/bonus/bonus_model.dart';
 import 'package:logic_game/data/constants.dart';
-import 'package:logic_game/data/enum.dart';
 import 'package:hive/hive.dart';
 
 part 'money_model.g.dart';

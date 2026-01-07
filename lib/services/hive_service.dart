@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:logic_game/data/constants.dart';
-import 'package:logic_game/data/enum.dart';
+import 'package:logic_game/data/enum/enum.dart';
 import 'package:logic_game/data/levels_import/all_level_list.dart';
 import 'package:logic_game/data/levels_import/levels_import_model.dart';
 import 'package:logic_game/models/hive/case/case_model.dart';

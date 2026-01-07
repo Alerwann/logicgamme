@@ -1,4 +1,4 @@
-import 'package:logic_game/data/enum.dart';
+import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
 
 class ResultDialogueBonus {
   final int quantity;

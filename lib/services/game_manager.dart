@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:logic_game/data/constants.dart';
-import 'package:logic_game/data/enum.dart';
+import 'package:logic_game/data/enum/enum.dart';
+import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
 import 'package:logic_game/models/hive/case/case_model.dart';
 import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:logic_game/models/hive/money/money_model.dart';
@@ -62,10 +63,10 @@ class GameManager extends StateNotifier<SessionState> {
   ) {
     return SessionState(
       levelConfig: niveau,
-      // roadList: [niveau.firstCase],
-      roadList: [CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1)],
-      // roadSet: {niveau.firstCase},
-      roadSet: {CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1)},
+      roadList: [niveau.firstCase],
+      // roadList: [CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1)],
+      roadSet: {niveau.firstCase},
+      // roadSet: {CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1)},
       lastTagSave: 1,
       statutPartie: EtatGame.loading,
       difficultyMode: TypeDifficulty.normal,
