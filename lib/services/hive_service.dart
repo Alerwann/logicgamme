@@ -1,9 +1,10 @@
 import 'dart:math';
-import 'package:clean_temp/data/enum.dart';
-import 'package:clean_temp/data/levels_import/all_level_list.dart';
-import 'package:clean_temp/data/levels_import/levels_import_model.dart';
-import 'package:clean_temp/models/hive/case/case_model.dart';
-import 'package:clean_temp/models/hive/level/level_model.dart';
+import 'package:logic_game/data/constants.dart';
+import 'package:logic_game/data/enum.dart';
+import 'package:logic_game/data/levels_import/all_level_list.dart';
+import 'package:logic_game/data/levels_import/levels_import_model.dart';
+import 'package:logic_game/models/hive/case/case_model.dart';
+import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
@@ -19,7 +20,7 @@ class HiveService {
   ///   - false si soit aucun niveau n'est trouvé dans le fichier soit si la création de niveau à échoué
   /// le string permet de retourner le commentaire à afficher
   ///
-  (bool, String) initLevels() {
+  static (bool, String) initLevels() {
     List<LevelsImport> allLevels = AllLevel.getDefaultList();
 
     if (allLevels.isEmpty || allLevels.length > allLevels.toSet().length) {
@@ -29,7 +30,7 @@ class HiveService {
       );
     }
 
-    final levelsBox = Hive.box<LevelModel>('levelsBox');
+    final levelsBox = Hive.box<LevelModel>(Constants.levelBox);
 
     int debutIndex = levelsBox.length;
 
@@ -84,8 +85,7 @@ class HiveService {
         return true;
       }
     } catch (e) {
-      if (kDebugMode) {
-      }
+      if (kDebugMode) {}
     }
     return false;
   }
@@ -97,7 +97,7 @@ class HiveService {
   /// retourne un [ResultLevelGenerator] suivant si l'action est réussie ou non
   /// Si la génération à échouer le retour sera false avec le codeerror
   /// Si elle a réussi sera true, avec comme code succès et la liste des cases générées, le maximum tag et la première case
-  ResultLevelGenerator _generateLevelComplet(LevelsImport levelImport) {
+  static ResultLevelGenerator _generateLevelComplet(LevelsImport levelImport) {
     final int size = levelImport.size;
 
     final List<CaseModel> listFinal = [];

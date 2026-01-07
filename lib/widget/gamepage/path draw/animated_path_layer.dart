@@ -1,8 +1,8 @@
-import 'package:clean_temp/models/hive/case/case_model.dart';
-import 'package:clean_temp/models/models%20utils/data_for_painting.dart';
-import 'package:clean_temp/models/hive/level/level_model.dart';
-import 'package:clean_temp/services/game_manager.dart';
-import 'package:clean_temp/widget/gamepage/path%20draw/path_painter.dart';
+import 'package:logic_game/models/hive/case/case_model.dart';
+import 'package:logic_game/models/models%20utils/data_for_painting.dart';
+import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/services/game_manager.dart';
+import 'package:logic_game/widget/gamepage/path%20draw/path_painter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

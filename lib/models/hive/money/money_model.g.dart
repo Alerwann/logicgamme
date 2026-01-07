@@ -8,7 +8,7 @@ part of 'money_model.dart';
 
 class MoneyModelAdapter extends TypeAdapter<MoneyModel> {
   @override
-  final int typeId = 2;
+  final int typeId = 0;
 
   @override
   MoneyModel read(BinaryReader reader) {
@@ -19,8 +19,8 @@ class MoneyModelAdapter extends TypeAdapter<MoneyModel> {
     return MoneyModel(
       bestLevel: fields[0] as int,
       gemeStock: fields[1] as int,
-      timeBonus: fields[2] as BonusDef,
-      difficultyBonus: fields[3] as BonusDef,
+      timeBonus: fields[2] as BonusModel,
+      difficultyBonus: fields[3] as BonusModel,
       canUseBonusTime: fields[4] as bool,
       canUseBonusDifficulty: fields[5] as bool,
     );

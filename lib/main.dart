@@ -1,9 +1,11 @@
-import 'package:clean_temp/Theme/material_theme.dart';
-import 'package:clean_temp/Theme/text_theme.dart';
-import 'package:clean_temp/data/constants.dart';
-import 'package:clean_temp/models/hive/level/level_model.dart';
-import 'package:clean_temp/models/hive/money/money_model.dart';
-import 'package:clean_temp/pages/home/home_botom_bar.dart';
+import 'package:logic_game/Theme/material_theme.dart';
+import 'package:logic_game/Theme/text_theme.dart';
+import 'package:logic_game/data/constants.dart';
+import 'package:logic_game/models/hive/bonus/bonus_model.dart';
+import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/models/hive/money/money_model.dart';
+import 'package:logic_game/pages/home/home_botom_bar.dart';
+import 'package:logic_game/services/hive_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -17,13 +19,17 @@ void main() async {
   Hive.registerAdapter(CaseModelAdapter());
   Hive.registerAdapter(MoneyModelAdapter());
   Hive.registerAdapter(LevelModelAdapter());
+  Hive.registerAdapter(BonusModelAdapter());
 
   await Hive.openBox<LevelModel>(Constants.levelBox);
   await Hive.openBox<MoneyModel>(Constants.moneyBox);
 
+  final (bool, String) initHiveService = HiveService.initLevels();
+  print(initHiveService.$2);
+
   runApp(
     // les providers avec Multiprovider(providers:[])
-   const ProviderScope(child: MyApp()),
+    const ProviderScope(child: MyApp()),
   );
 }
 
@@ -35,7 +41,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
 
-      title: 'logicgame',
+      title: 'logic_game',
 
       theme: MaterialTheme(AppTypography.createTextTheme()).light(),
       darkTheme: MaterialTheme(AppTypography.createTextTheme()).dark(),

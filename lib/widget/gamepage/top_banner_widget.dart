@@ -1,5 +1,5 @@
-import 'package:clean_temp/models/hive/level/level_model.dart';
-import 'package:clean_temp/services/game_manager.dart';
+import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/services/game_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,7 +9,9 @@ class TopBannerWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(gameManagerProvider(level).select((s)=>(s.moneyData,)));
+    final provider = ref.watch(
+      gameManagerProvider(level).select((s) => (s.moneyData,)),
+    );
     return Container(
       height: 200,
       padding: EdgeInsets.only(top: 20),
@@ -72,7 +74,8 @@ class TopBannerWidget extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  provider.$1.difficultyBonus.quantity.toString(),
+                                  provider.$1.difficultyBonus.quantity
+                                      .toString(),
                                   style: TextTheme.of(context).titleLarge,
                                 ),
                                 Image.asset(
@@ -90,7 +93,7 @@ class TopBannerWidget extends ConsumerWidget {
                           spacing: 10,
                           children: [
                             Text(
-                             provider.$1.gemeStock.toString(),
+                              provider.$1.gemeStock.toString(),
                               style: TextTheme.of(context).titleLarge,
                             ),
                             Image.asset(

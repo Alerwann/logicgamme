@@ -7,8 +7,8 @@ part 'case_model.g.dart';
 /// Chaque case est définie par ses coordonnées [xValue] et [yValue].
 /// L'origine (0,0) se situe dans le coin supérieur gauche.
 
-@HiveType(typeId: 1)
-class CaseModel extends HiveObject {
+@HiveType(typeId: 2)
+class CaseModel {
   @HiveField(0)
   final int xValue;
   @HiveField(1)

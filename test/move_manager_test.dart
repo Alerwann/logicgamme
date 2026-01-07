@@ -1,9 +1,9 @@
-// import 'package:clean_temp/data/enum.dart';
-// import 'package:clean_temp/models/case/case_model.dart';
-// import 'package:clean_temp/models/level/level_model.dart';
-// import 'package:clean_temp/models/money/money_model.dart';
-// import 'package:clean_temp/models/session_state.dart';
-// import 'package:clean_temp/services/move_manager_service.dart';
+// import 'package:logic_game/data/enum.dart';
+// import 'package:logic_game/models/case/case_model.dart';
+// import 'package:logic_game/models/level/level_model.dart';
+// import 'package:logic_game/models/money/money_model.dart';
+// import 'package:logic_game/models/session_state.dart';
+// import 'package:logic_game/services/move_manager_service.dart';
 // import 'package:flutter_test/flutter_test.dart';
 
 // void main() {

@@ -1,4 +1,4 @@
-import 'package:clean_temp/models/models%20utils/data_for_painting.dart';
+import 'package:logic_game/models/models%20utils/data_for_painting.dart';
 
 class CalculCoordonnee {
   static (double, double) centerCaseWithCoord(
@@ -20,7 +20,4 @@ class CalculCoordonnee {
 
     return OffsetsForPainting(startOffset: startOffset, endOffset: endOffset);
   }
-
-
-
 }

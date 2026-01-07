@@ -1,8 +1,8 @@
-import 'package:clean_temp/models/hive/case/case_model.dart';
-import 'package:clean_temp/models/models%20utils/data_for_painting.dart';
-import 'package:clean_temp/models/hive/level/level_model.dart';
-import 'package:clean_temp/utils/calcul_coordonnee.dart';
-import 'package:clean_temp/widget/gamepage/path%20draw/animated_path_layer.dart';
+import 'package:logic_game/models/hive/case/case_model.dart';
+import 'package:logic_game/models/models%20utils/data_for_painting.dart';
+import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/utils/calcul_coordonnee.dart';
+import 'package:logic_game/widget/gamepage/path%20draw/animated_path_layer.dart';
 import 'package:flutter/material.dart';
 
 class PathPainter extends CustomPainter {

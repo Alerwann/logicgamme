@@ -1,7 +1,8 @@
-import 'package:clean_temp/models/hive/case/case_model.dart';
-import 'package:clean_temp/models/hive/level/level_model.dart';
-import 'package:clean_temp/pages/game/game_page.dart';
+import 'package:logic_game/models/hive/case/case_model.dart';
+import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/pages/game/game_page.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class HomeBottomBar extends StatefulWidget {
   const HomeBottomBar({super.key});
@@ -12,7 +13,7 @@ class HomeBottomBar extends StatefulWidget {
 
 class _HomeBottomBarState extends State<HomeBottomBar> {
   LevelModel levelTest = LevelModel(
-    levelId: 1,
+    levelId: 10,
     cases: [
       CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1),
       CaseModel(xValue: 1, yValue: 0),
@@ -45,7 +46,7 @@ class _HomeBottomBarState extends State<HomeBottomBar> {
       CaseModel(xValue: 0, yValue: 4),
       CaseModel(xValue: 1, yValue: 4),
       CaseModel(xValue: 2, yValue: 4),
-      CaseModel(xValue: 3, yValue: 4, ),
+      CaseModel(xValue: 3, yValue: 4),
       CaseModel(xValue: 4, yValue: 4),
       CaseModel(xValue: 5, yValue: 4),
 
@@ -60,9 +61,12 @@ class _HomeBottomBarState extends State<HomeBottomBar> {
     maxTag: 4,
     size: 6,
   );
+  final levelsBox = Hive.box<LevelModel>('levelsBox');
 
   @override
   Widget build(BuildContext context) {
+    final LevelModel level = levelsBox.getAt(1) ?? levelTest;
+    print("levelid choisi = ${level.levelId}");
     return Scaffold(
       appBar: AppBar(title: Text("Everyone")),
       body: Center(
@@ -70,9 +74,7 @@ class _HomeBottomBarState extends State<HomeBottomBar> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => GamePage(level: levelTest),
-              ),
+              MaterialPageRoute(builder: (context) => GamePage(level: level)),
             );
           },
           child: Text("Niveau test"),

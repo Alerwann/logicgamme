@@ -1,4 +1,4 @@
-import 'package:clean_temp/models/hive/case/case_model.dart';
+import 'package:logic_game/models/hive/case/case_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -12,7 +12,7 @@ part 'level_model.g.dart';
 /// [firstCase] qui représente le point de départ sur la grille qui est la case à la balise 1
 /// [maxTag] qui représente le numéro de la dernière balise
 
-@HiveType(typeId: 3)
+@HiveType(typeId: 1)
 class LevelModel extends HiveObject {
   @HiveField(0)
   final int levelId;
@@ -63,6 +63,6 @@ class LevelModel extends HiveObject {
     bestRecordNormalSeconds,
     firstCase,
     maxTag,
-    size
+    size,
   );
 }

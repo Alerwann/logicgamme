@@ -1,4 +1,5 @@
-import 'package:clean_temp/data/levels_import/levels_import_model.dart';
+import 'package:logic_game/data/levels_import/levels_import_model.dart';
+
 /// Classe qui répertorie l'ensemble des niveaux sous forme de liste
 class AllLevel {
   static final List<LevelsImport> _defaultList = [
@@ -62,7 +63,6 @@ class AllLevel {
   ];
 
   static List<LevelsImport> getDefaultList() {
-    
-    return List.from( _defaultList);
+    return List.from(_defaultList);
   }
 }

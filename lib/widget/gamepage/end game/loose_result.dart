@@ -1,4 +1,4 @@
-import 'package:clean_temp/models/hive/level/level_model.dart';
+import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:flutter/material.dart';
 
 class LooseResult extends StatelessWidget {

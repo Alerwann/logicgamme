@@ -1,7 +1,7 @@
-name: clean_temp
+name: logic_game
 description: "A new Flutter project."
 
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1
 
@@ -12,11 +12,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-
   cupertino_icons: ^1.0.8
   flutter_launcher_icons: ^0.14.4
   google_fonts: ^6.3.3
-
 
   hive: ^2.2.3
   hive_flutter: ^1.1.0
@@ -36,11 +34,7 @@ dev_dependencies:
   path_provider: ^2.1.5
   custom_lint: ^0.6.4
 
-
-
 flutter:
-
-
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
@@ -48,11 +42,6 @@ flutter:
     - assets/
     - assets/images/logo_hard.png
     - assets/images/
-  
-
-
-
-
 
   # fonts:
   #   - family: Schyler
@@ -66,7 +55,6 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
-
 
 flutter_launcher_icons:
   android: true

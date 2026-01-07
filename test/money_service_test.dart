@@ -1,8 +1,8 @@
-// import 'package:clean_temp/data/constants.dart';
+// import 'package:logic_game/data/constants.dart';
 // import 'package:flutter_test/flutter_test.dart';
-// import 'package:clean_temp/services/money_service.dart';
-// import 'package:clean_temp/models/money/money_model.dart';
-// import 'package:clean_temp/data/enum.dart';
+// import 'package:logic_game/services/money_service.dart';
+// import 'package:logic_game/models/money/money_model.dart';
+// import 'package:logic_game/data/enum.dart';
 
 // void main() {
 //   final moneyService = MoneyService();

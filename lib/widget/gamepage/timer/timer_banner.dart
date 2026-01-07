@@ -1,8 +1,8 @@
-import 'package:clean_temp/data/constants.dart';
-import 'package:clean_temp/data/enum.dart';
-import 'package:clean_temp/models/hive/level/level_model.dart';
-import 'package:clean_temp/services/game_manager.dart';
-import 'package:clean_temp/widget/gamepage/timer/format_time.dart';
+import 'package:logic_game/data/constants.dart';
+import 'package:logic_game/data/enum.dart';
+import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/services/game_manager.dart';
+import 'package:logic_game/widget/gamepage/timer/format_time.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,7 +38,6 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
 
     controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
- 
         initCompteurValue = controller.value.toInt();
         final notifier = ref.read(gameManagerProvider(widget.level).notifier);
         notifier.canUseBonus();

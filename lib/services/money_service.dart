@@ -1,12 +1,13 @@
-import 'package:clean_temp/models/models%20utils/bonus_validation.dart';
-import 'package:clean_temp/data/constants.dart';
-import 'package:clean_temp/data/enum.dart';
-import 'package:clean_temp/models/hive/money/money_model.dart';
-import 'package:flutter/foundation.dart';
+import 'package:logic_game/models/hive/bonus/bonus_model.dart';
+import 'package:logic_game/data/constants.dart';
+import 'package:logic_game/data/enum.dart';
+import 'package:logic_game/models/hive/money/money_model.dart';
 
 /// Service permettant de modifier le nombre de bonus et monnaie virtuelle
 ///
 class MoneyService {
+  static void initMoney() {}
+
   /// gestion de la vérification
   ///
   /// Paramètre:
@@ -17,8 +18,8 @@ class MoneyService {
   (bool, bool) canAllUseBonus(MoneyModel moneystate) {
     bool canBuytime;
     bool canBuyDifficulty;
-    BonusDef time = moneystate.timeBonus;
-    BonusDef diff = moneystate.difficultyBonus;
+    BonusModel time = moneystate.timeBonus;
+    BonusModel diff = moneystate.difficultyBonus;
 
     canBuyDifficulty =
         moneystate.gemeStock >= diff.costForBuy || diff.quantity > 0;
@@ -47,8 +48,7 @@ class MoneyService {
     MoneyModel newState;
 
     /// tentative d'achat
-     newState = testTypeBuyBonus(type, moneyState);
-   
+    newState = testTypeBuyBonus(type, moneyState);
 
     /// tentative de sauvegarde
     return await saveMoneyModel(newState, moneyState);
@@ -65,12 +65,9 @@ class MoneyService {
   /// Retourne true et le nouveau modèle si achat réussi
   /// Sinon retourne false et le modèle initial
   ///
-  MoneyModel testTypeBuyBonus(
-    TypeBonus type,
-    MoneyModel moneyState,
-  ) {
-    BonusDef principalDef;
-    BonusDef secondairDef;
+  MoneyModel testTypeBuyBonus(TypeBonus type, MoneyModel moneyState) {
+    BonusModel principalDef;
+    BonusModel secondairDef;
 
     int newGemme = moneyState.gemeStock;
 
@@ -107,13 +104,15 @@ class MoneyService {
           : secondairDef,
       gemeStock: newGemme,
     );
-    // newCanBuy = canAllUseBonus(money);
-  
+
     final canAllBonus = canAllUseBonus(money);
     final canBuytime = canAllBonus.$1;
     final canBuyDifficulty = canAllBonus.$2;
 
-    money = money.copyWith(canUseBonusDifficulty: canBuyDifficulty,canUseBonusTime: canBuytime);
+    money = money.copyWith(
+      canUseBonusDifficulty: canBuyDifficulty,
+      canUseBonusTime: canBuytime,
+    );
 
     return money;
   }
@@ -167,7 +166,7 @@ class MoneyService {
         break;
     }
 
-    if (levelId == moneyState.bestLevel) {
+    if (levelId > moneyState.bestLevel) {
       stateToUpdate = moneyState.copyWith(
         bestLevel: levelId + 1,
         gemeStock: winGemme,
@@ -197,13 +196,12 @@ class MoneyService {
     try {
       await newState.save();
     } catch (e) {
-      if (kDebugMode) {
-        return ResultActionBonus(
-          isDo: false,
-          statusCode: BuyStatusCode.saveKO,
-          state: oldState,
-        );
-      }
+      print("erreur de sauvegarde : $e");
+      return ResultActionBonus(
+        isDo: false,
+        statusCode: BuyStatusCode.saveKO,
+        state: oldState,
+      );
     }
     return ResultActionBonus(
       isDo: true,

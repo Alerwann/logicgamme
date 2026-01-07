@@ -1,17 +1,17 @@
 import 'dart:async';
-import 'package:clean_temp/data/constants.dart';
-import 'package:clean_temp/data/enum.dart';
-import 'package:clean_temp/models/hive/case/case_model.dart';
-import 'package:clean_temp/models/hive/level/level_model.dart';
-import 'package:clean_temp/models/hive/money/money_model.dart';
-import 'package:clean_temp/models/tempory/session_state.dart';
-import 'package:clean_temp/providers/hive_service_provider.dart';
-import 'package:clean_temp/providers/message_provider.dart';
-import 'package:clean_temp/providers/money_provider.dart';
-import 'package:clean_temp/providers/money_service_provider.dart';
-import 'package:clean_temp/services/hive_service.dart';
-import 'package:clean_temp/services/money_service.dart';
-import 'package:clean_temp/services/move_manager_service.dart';
+import 'package:logic_game/data/constants.dart';
+import 'package:logic_game/data/enum.dart';
+import 'package:logic_game/models/hive/case/case_model.dart';
+import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/models/hive/money/money_model.dart';
+import 'package:logic_game/models/tempory/session_state.dart';
+import 'package:logic_game/providers/hive_service_provider.dart';
+import 'package:logic_game/providers/message_provider.dart';
+import 'package:logic_game/providers/money_provider.dart';
+import 'package:logic_game/providers/money_service_provider.dart';
+import 'package:logic_game/services/hive_service.dart';
+import 'package:logic_game/services/money_service.dart';
+import 'package:logic_game/services/move_manager_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -172,6 +172,7 @@ class GameManager extends StateNotifier<SessionState> {
   /// Après vérification si le record est battut, envoie de la demande de sauvegarde
   ///
   Future<void> _saveRecord(int timeGame) async {
+    print("Save record");
     if (state.levelConfig.bestRecordNormalSeconds > timeGame) {
       try {
         await _hiveService.saveRecord(state.levelConfig.levelId, timeGame);
@@ -191,12 +192,14 @@ class GameManager extends StateNotifier<SessionState> {
   /// Si la partie est gagnée envoie la maj des information de [MoneyService]
   ///
   Future<void> _saveWinGame() async {
+    print("save victoire");
     try {
       ResultActionBonus returnState = await _moneyService.handleWinGame(
         levelId: state.levelConfig.levelId,
         difficultyMode: state.difficultyMode,
         moneyState: state.moneyData,
       );
+      print("isdo dans le saveWinGame : ${returnState.isDo}");
       if (returnState.isDo) {
         state = state.copyWith(moneyData: returnState.state);
       } else {
@@ -218,13 +221,9 @@ class GameManager extends StateNotifier<SessionState> {
   /// Sinon retour comme quoi le tableau n'est pas remplis
 
   void _checkEndGame(SessionState result) async {
-    print(
-      "checkAndgame. : ${result.roadList.length} =? ${state.levelConfig.cases.length}",
-    );
     if (result.roadList.length == state.levelConfig.cases.length) {
-      print("gagné");
       state = state.copyWith(timerState: TimerAction.win);
-      print(state.timerState);
+
       _result = result;
     } else {
       _errorSetCase = state.levelConfig.cases.toSet().difference(
@@ -321,19 +320,16 @@ class GameManager extends StateNotifier<SessionState> {
   ///
   /// Passage à isPlaying en fin quoi qu'il arrive
   Future<void> _difficultyChoose(bool chooseHard) async {
-    print("Achat du bonus de difficultés");
     if (!chooseHard) {
-      print("j'en veut pas");
       _maxCurrentValue = Constants.DURATION_NORMAL_MODE;
       state = state.copyWith(statutPartie: EtatGame.isPlaying);
     } else {
-      print("j'en veux un");
       try {
         final resultBuy = await _moneyService.buyBonus(
           state.moneyData,
           TypeBonus.bonusDifficulty,
         );
-        print("c'est acheté : ${resultBuy.isDo} ${resultBuy.statusCode}");
+
         if (resultBuy.isDo) {
           _maxCurrentValue = Constants.DURATION_HARD_MODE;
           state = state.copyWith(
@@ -370,7 +366,6 @@ class GameManager extends StateNotifier<SessionState> {
   ///
   ///
   Future<void> _addTimechoose(bool chooseTime) async {
-    print("Achat du bonus de temps");
     if (!chooseTime) {
       state = state.copyWith(stateGamePage: StateGamePage.loose);
     } else {

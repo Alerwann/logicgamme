@@ -1,8 +1,8 @@
-import 'package:clean_temp/data/enum.dart';
-import 'package:clean_temp/models/hive/case/case_model.dart';
-import 'package:clean_temp/models/models%20utils/data_for_painting.dart';
-import 'package:clean_temp/models/hive/level/level_model.dart';
-import 'package:clean_temp/models/tempory/session_state.dart';
+import 'package:logic_game/data/enum.dart';
+import 'package:logic_game/models/hive/case/case_model.dart';
+import 'package:logic_game/models/models%20utils/data_for_painting.dart';
+import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/models/tempory/session_state.dart';
 
 /// Service de gestion et vérification des mouvements pendant le jeu
 
@@ -299,7 +299,6 @@ class MoveManagerService {
         if (cases.numberTag == temporyTag + 1) {
           temporyTag = cases.numberTag!;
         } else {
-      
           return ResultOrderTag(
             goodOrder: false,
             lastTag: lastTagSave,

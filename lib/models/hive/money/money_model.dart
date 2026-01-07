@@ -1,13 +1,13 @@
-import 'package:clean_temp/models/models%20utils/bonus_validation.dart';
-import 'package:clean_temp/data/constants.dart';
-import 'package:clean_temp/data/enum.dart';
+import 'package:logic_game/models/hive/bonus/bonus_model.dart';
+import 'package:logic_game/data/constants.dart';
+import 'package:logic_game/data/enum.dart';
 import 'package:hive/hive.dart';
 
 part 'money_model.g.dart';
 
 /// Représente les stocks de bonus et d'argent virtuel(gemmes)
 
-@HiveType(typeId: 2)
+@HiveType(typeId: 0)
 class MoneyModel extends HiveObject {
   @HiveField(0)
   ///L'id du dernier niveau atteint par le joueur
@@ -19,10 +19,10 @@ class MoneyModel extends HiveObject {
 
   @HiveField(2)
   /// Les gemes sont la monaie permanente du jeu et s'acquière à chaque niveau
-  BonusDef timeBonus;
+  BonusModel timeBonus;
   @HiveField(3)
   /// 1 fois par jour le joueur peut échouer gratuitement à un mode HARD
-  BonusDef difficultyBonus;
+  BonusModel difficultyBonus;
   @HiveField(4)
   bool canUseBonusTime;
   @HiveField(5)
@@ -40,21 +40,23 @@ class MoneyModel extends HiveObject {
   /// Stock par défaut de bonus et argent virtuel
   ///
   factory MoneyModel.initial() {
+    print("init de money model");
     return MoneyModel(
       bestLevel: 0,
       gemeStock: 0,
-      difficultyBonus: BonusDef(
-        nameBonus: TypeBonus.bonusDifficulty,
-        costForBuy: Constants.COUT_HARD_ACHAT,
-        quantity: 1,
-        gain: Constants.GAIN_HARD_BONUS,
-      ),
-      timeBonus: BonusDef(
+      timeBonus: BonusModel(
         nameBonus: TypeBonus.bonusTime,
         costForBuy: Constants.COUT_ADD_TIME,
         quantity: 3,
         gain: Constants.TIME_ADD_SECONDS,
       ),
+      difficultyBonus: BonusModel(
+        nameBonus: TypeBonus.bonusDifficulty,
+        costForBuy: Constants.COUT_HARD_ACHAT,
+        quantity: 1,
+        gain: Constants.GAIN_HARD_BONUS,
+      ),
+
       canUseBonusTime: true,
       canUseBonusDifficulty: true,
     );
@@ -65,9 +67,9 @@ class MoneyModel extends HiveObject {
     int? bestLevel,
     int? gemeStock,
 
-    BonusDef? timeBonus,
+    BonusModel? timeBonus,
 
-    BonusDef? difficultyBonus,
+    BonusModel? difficultyBonus,
     bool? canUseBonusTime,
     bool? canUseBonusDifficulty,
   }) {
@@ -96,7 +98,7 @@ class MoneyModel extends HiveObject {
           difficultyBonus == other.difficultyBonus &&
           timeBonus == other.timeBonus &&
           canUseBonusTime == other.canUseBonusTime &&
-          canUseBonusDifficulty==other.canUseBonusDifficulty;
+          canUseBonusDifficulty == other.canUseBonusDifficulty;
 
   /// Génère une clé de hachage basée sur l'ensemble des propriétés de la case.
   @override
@@ -106,6 +108,7 @@ class MoneyModel extends HiveObject {
     gemeStock,
     difficultyBonus,
     timeBonus,
-    canUseBonusTime,canUseBonusDifficulty,
+    canUseBonusTime,
+    canUseBonusDifficulty,
   );
 }

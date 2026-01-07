@@ -1,10 +1,10 @@
-import 'package:clean_temp/data/enum.dart';
-import 'package:clean_temp/models/hive/level/level_model.dart';
-import 'package:clean_temp/pages/game/game_main_layout.dart';
-import 'package:clean_temp/services/game_manager.dart';
-import 'package:clean_temp/widget/gamepage/end%20game/loose_result.dart';
-import 'package:clean_temp/widget/gamepage/end%20game/win_result.dart';
-import 'package:clean_temp/widget/gamepage/game%20events%20listener/game_events_listener.dart';
+import 'package:logic_game/data/enum.dart';
+import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/pages/game/game_main_layout.dart';
+import 'package:logic_game/services/game_manager.dart';
+import 'package:logic_game/widget/gamepage/end%20game/loose_result.dart';
+import 'package:logic_game/widget/gamepage/end%20game/win_result.dart';
+import 'package:logic_game/widget/gamepage/game%20events%20listener/game_events_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

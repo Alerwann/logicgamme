@@ -1,8 +1,8 @@
-import 'package:clean_temp/models/hive/level/level_model.dart';
-import 'package:clean_temp/widget/gamepage/gridbanner/case_widget.dart';
-import 'package:clean_temp/widget/gamepage/path%20draw/animated_path_layer.dart';
-import 'package:clean_temp/widget/gamepage/gridbanner/error_gesture_gestion.dart';
-import 'package:clean_temp/widget/gamepage/gridbanner/static_background_grid.dart';
+import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/widget/gamepage/gridbanner/case_widget.dart';
+import 'package:logic_game/widget/gamepage/path%20draw/animated_path_layer.dart';
+import 'package:logic_game/widget/gamepage/gridbanner/error_gesture_gestion.dart';
+import 'package:logic_game/widget/gamepage/gridbanner/static_background_grid.dart';
 import 'package:flutter/material.dart';
 
 class GridBanner extends StatelessWidget {
@@ -25,10 +25,9 @@ class GridBanner extends StatelessWidget {
                 //  Dessin du shéma
                 AnimatedPathLayer(level: level, sizeGrid: sizeGrid),
 
-            
                 // dessin des cases
                 CaseWidget(level: level),
-                    // Erreur et geste
+                // Erreur et geste
                 ErrorGestureGestion(level: level),
               ],
             ),

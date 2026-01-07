@@ -57,7 +57,7 @@ enum MoveStatusCode {
   otherError,
 }
 
-enum ErrorPlayer { wall, other, none, snackbar}
+enum ErrorPlayer { wall, other, none, snackbar }
 
 enum TypeMove { vertical, horizontal }
 
