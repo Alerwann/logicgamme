@@ -19,7 +19,7 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
   late AnimationController controller;
 
   int dureeMax = 60;
-  double ratio = 1;
+  // double ratio = 1;
 
   int initCompteurValue = 0;
 
@@ -30,6 +30,7 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
   @override
   void initState() {
     super.initState();
+
     controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: dureeMax),
@@ -38,7 +39,8 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
 
     controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        initCompteurValue = controller.value.toInt();
+        initCompteurValue = timeValue + 1;
+        controller.reset();
         final notifier = ref.read(gameManagerProvider(widget.level).notifier);
         notifier.canUseBonus();
       }
@@ -48,7 +50,6 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
   @override
   void dispose() {
     controller.dispose();
-
     super.dispose();
   }
 
@@ -62,23 +63,18 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
               .read(gameManagerProvider(widget.level).notifier)
               .maxCurrentValue;
           controller.duration = Duration(seconds: dureeMax);
-
+          controller.forward();
+        } else if (next == TimerAction.addTime) {
+          print("on passe en addtime init ");
+          controller.duration = Duration(seconds: Constants.TIME_ADD_SECONDS);
+          dureeMax = Constants.TIME_ADD_SECONDS;
           controller.forward();
         } else if (next == TimerAction.win) {
-          print("finish game");
-          controller.stop();
+          print("win de time baner");
           ref
               .read(gameManagerProvider(widget.level).notifier)
               .finishGame(timeValue);
-        } else if (previous == TimerAction.pause && next == TimerAction.play) {
-          controller.forward();
-        } else if (next == TimerAction.pause || previous == TimerAction.stop) {
           controller.stop();
-        } else if (previous == TimerAction.stop &&
-            next == TimerAction.addTime) {
-          controller.duration = Duration(seconds: Constants.TIME_ADD_SECONDS);
-          controller.value = 0;
-          controller.forward();
         }
       },
     );
@@ -106,11 +102,10 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
               child: AnimatedBuilder(
                 animation: controller,
                 builder: (context, child) {
-                  // print(controller.value);
                   currentDuration = controller.duration?.inSeconds ?? 0;
                   timeValue =
-                      initCompteurValue +
-                      ((controller.value) * currentDuration).floor();
+                      (initCompteurValue +
+                      ((controller.value) * currentDuration).floor());
 
                   return Stack(
                     children: [
@@ -130,15 +125,18 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
           ),
           IconButton(
             onPressed: () {
-              pauseAction
-                  ? ref
-                        .read(gameManagerProvider(widget.level).notifier)
-                        .resumeTime()
-                  : {
-                      ref
-                          .read(gameManagerProvider(widget.level).notifier)
-                          .pauseTime(),
-                    };
+              if (pauseAction) {
+                ref
+                    .read(gameManagerProvider(widget.level).notifier)
+                    .resumeTime();
+                controller.forward();
+              } else {
+                ref
+                    .read(gameManagerProvider(widget.level).notifier)
+                    .pauseTime();
+                controller.stop();
+              }
+
               setState(() {
                 pauseAction = !pauseAction;
               });

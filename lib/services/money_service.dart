@@ -55,13 +55,10 @@ class MoneyService {
     TypeBonus type,
   ) async {
     MoneyModel newState;
-    print("buy");
+
 
     /// tentative d'achat
     newState = testTypeBuyBonus(type, moneyState);
-    print(
-      "newstate dif bonus : ${newState.difficultyBonus.quantity} et time bonus ${newState.timeBonus.quantity}",
-    );
 
     /// tentative de sauvegarde
     return await saveMoneyModel(newState, moneyState);
@@ -89,7 +86,7 @@ class MoneyService {
     MoneyModel money;
 
     // définition du type de bonus testé
-    print("testbuy");
+  
     switch (type) {
       case TypeBonus.bonusTime:
         principalDef = moneyState.timeBonus;
@@ -102,9 +99,7 @@ class MoneyService {
     quantity = principalDef.quantity;
     price = principalDef.costForBuy;
     // si possible d'acheté on fait les modifications
-    print(
-      "quantité de dif $quantity et de time ${secondairDef.quantity} avant",
-    );
+
 
     if (quantity > 0) {
       quantity = quantity - 1;
@@ -120,17 +115,17 @@ class MoneyService {
           : secondairDef,
       gemeStock: newGemme,
     );
-    print(money.difficultyBonus.quantity);
+    // print(money.difficultyBonus.quantity);
     final canAllBonus = canAllUseBonus(money);
     final canBuytime = canAllBonus.$1;
     final canBuyDifficulty = canAllBonus.$2;
-    print("canbuy time : $canBuytime, canbuy dif :$canBuyDifficulty");
+    // print("canbuy time : $canBuytime, canbuy dif :$canBuyDifficulty");
 
     money = money.copyWith(
       canUseBonusDifficulty: canBuyDifficulty,
       canUseBonusTime: canBuytime,
     );
-    print("quantité de dif $quantity et de time ${secondairDef.quantity} fin");
+    print("quantité de gemme $newGemme");
     return money;
   }
 

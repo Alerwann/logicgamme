@@ -122,6 +122,7 @@ class GameManager extends StateNotifier<SessionState> {
   /// [endState] est l'état de la partie après l'animation soit en jeu soit en victoire
   /// [result] est l'état de la session après la vérification pour mettre à jour la route finale après l'animation
   void _startAnimationTimer(bool win, SessionState result) {
+    print("start animation pour victoire? $win");
     const int tickMs = 20;
     double progress = 0;
 
@@ -145,6 +146,7 @@ class GameManager extends StateNotifier<SessionState> {
                 dataPainting: null,
                 stateGamePage: StateGamePage.win,
                 statutPartie: EtatGame.win,
+                timerState: TimerAction.stop
               )
             : state = result.copyWith(
                 animationProgress: null,
@@ -166,7 +168,7 @@ class GameManager extends StateNotifier<SessionState> {
   //gestion des scores de fin de partie
 
   Future<void> finishGame(int timeGame) async {
-    print("Sauvegarde de win");
+    print("win finish time: $timeGame");
     await _saveRecord(timeGame);
     await _saveWinGame();
     _startAnimationTimer(true, _result);
@@ -175,7 +177,6 @@ class GameManager extends StateNotifier<SessionState> {
   /// Après vérification si le record est battut, envoie de la demande de sauvegarde
   ///
   Future<void> _saveRecord(int timeGame) async {
-    print("Save record");
     if (state.levelConfig.bestRecordNormalSeconds > timeGame) {
       try {
         await _hiveService.saveRecord(state.levelConfig.levelId, timeGame);
@@ -223,6 +224,7 @@ class GameManager extends StateNotifier<SessionState> {
 
   void _checkEndGame(SessionState result) async {
     if (result.roadList.length == state.levelConfig.cases.length) {
+      print("win de checkend");
       state = state.copyWith(timerState: TimerAction.win);
 
       _result = result;
