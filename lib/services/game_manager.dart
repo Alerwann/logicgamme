@@ -48,6 +48,7 @@ class GameManager extends StateNotifier<SessionState> {
     required MoneyModel initialMoney,
   }) : super(_calculerEtatInitial(levelPlaying, initialMoney)) {
     // vérificaiton de sécurité
+    print("initialisation du manager");
     if (initialMoney.canUseBonusDifficulty) {
       state = state.copyWith(statutPartie: EtatGame.waitDifficulty);
       _stratWaitingDifficulty();
@@ -143,6 +144,7 @@ class GameManager extends StateNotifier<SessionState> {
                 animationProgress: null,
                 dataPainting: null,
                 stateGamePage: StateGamePage.win,
+                statutPartie: EtatGame.win,
               )
             : state = result.copyWith(
                 animationProgress: null,
@@ -193,14 +195,12 @@ class GameManager extends StateNotifier<SessionState> {
   /// Si la partie est gagnée envoie la maj des information de [MoneyService]
   ///
   Future<void> _saveWinGame() async {
-    print("save victoire");
     try {
       ResultActionBonus returnState = await _moneyService.handleWinGame(
         levelId: state.levelConfig.levelId,
         difficultyMode: state.difficultyMode,
         moneyState: state.moneyData,
       );
-      print("isdo dans le saveWinGame : ${returnState.isDo}");
       if (returnState.isDo) {
         state = state.copyWith(moneyData: returnState.state);
       } else {

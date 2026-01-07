@@ -40,7 +40,6 @@ class MoneyModel extends HiveObject {
   /// Stock par défaut de bonus et argent virtuel
   ///
   factory MoneyModel.initial() {
-    print("init de money model");
     return MoneyModel(
       bestLevel: 0,
       gemeStock: 0,

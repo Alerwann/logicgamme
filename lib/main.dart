@@ -5,7 +5,7 @@ import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
 import 'package:logic_game/models/hive/bonus/bonus_model.dart';
 import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:logic_game/models/hive/money/money_model.dart';
-import 'package:logic_game/pages/home/home_botom_bar.dart';
+import 'package:logic_game/pages/home/home_game.dart';
 import 'package:logic_game/services/hive_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,17 +22,17 @@ void main() async {
   Hive.registerAdapter(MoneyModelAdapter());
   Hive.registerAdapter(LevelModelAdapter());
   Hive.registerAdapter(BonusModelAdapter());
+  
   Hive.registerAdapter(TypeBonusAdapter());
 
   await Hive.openBox<LevelModel>(Constants.levelBox);
   await Hive.openBox<MoneyModel>(Constants.moneyBox);
   MoneyService.initMoney();
 
-  final (bool, String) initHiveService = HiveService.initLevels();
-  print(initHiveService.$2);
+ HiveService.initLevels();
+
 
   runApp(
-    // les providers avec Multiprovider(providers:[])
     const ProviderScope(child: MyApp()),
   );
 }
@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
       darkTheme: MaterialTheme(AppTypography.createTextTheme()).dark(),
       themeMode: ThemeMode.system,
 
-      home: const HomeBottomBar(),
+      home: const HomeGame(),
     );
   }
 }

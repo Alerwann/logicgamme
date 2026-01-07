@@ -28,6 +28,7 @@ class GameEventsListener extends ConsumerWidget {
       next,
     ) {
       if (next == EtatGame.chooseDifficulty) {
+        print('je suis appelé');
         _initDifficulty(context, ref, level);
       } else if (next == EtatGame.chooseAddTime) {
         _initTimeMessage(context, ref, level);

@@ -10,13 +10,9 @@ import 'package:logic_game/models/hive/money/money_model.dart';
 class MoneyService {
   static void initMoney() async {
     final moneyBox = Hive.box<MoneyModel>(Constants.moneyBox);
-    print(moneyBox.isEmpty);
     if (moneyBox.isEmpty) {
       await moneyBox.put(0, MoneyModel.initial());
       print("Valeurs de monnaie par défaut installées");
-    } else {
-      final moneyessai = moneyBox.get(0)!.gemeStock;
-      print("moneyessai : $moneyessai");
     }
   }
 
@@ -28,6 +24,7 @@ class MoneyService {
   ///
   /// Retourne True si le joueur a de quoi acheter le bonus et false sinon
   (bool, bool) canAllUseBonus(MoneyModel moneystate) {
+    print("canAll");
     bool canBuytime;
     bool canBuyDifficulty;
     BonusModel time = moneystate.timeBonus;
@@ -58,9 +55,13 @@ class MoneyService {
     TypeBonus type,
   ) async {
     MoneyModel newState;
+    print("buy");
 
     /// tentative d'achat
     newState = testTypeBuyBonus(type, moneyState);
+    print(
+      "newstate dif bonus : ${newState.difficultyBonus.quantity} et time bonus ${newState.timeBonus.quantity}",
+    );
 
     /// tentative de sauvegarde
     return await saveMoneyModel(newState, moneyState);
@@ -88,7 +89,7 @@ class MoneyService {
     MoneyModel money;
 
     // définition du type de bonus testé
-
+    print("testbuy");
     switch (type) {
       case TypeBonus.bonusTime:
         principalDef = moneyState.timeBonus;
@@ -101,6 +102,9 @@ class MoneyService {
     quantity = principalDef.quantity;
     price = principalDef.costForBuy;
     // si possible d'acheté on fait les modifications
+    print(
+      "quantité de dif $quantity et de time ${secondairDef.quantity} avant",
+    );
 
     if (quantity > 0) {
       quantity = quantity - 1;
@@ -111,21 +115,22 @@ class MoneyService {
 
     money = moneyState.copyWith(
       timeBonus: type == TypeBonus.bonusTime ? principalDef : secondairDef,
-      difficultyBonus: type == TypeBonus.bonusTime
+      difficultyBonus: type == TypeBonus.bonusDifficulty
           ? principalDef
           : secondairDef,
       gemeStock: newGemme,
     );
-
+    print(money.difficultyBonus.quantity);
     final canAllBonus = canAllUseBonus(money);
     final canBuytime = canAllBonus.$1;
     final canBuyDifficulty = canAllBonus.$2;
+    print("canbuy time : $canBuytime, canbuy dif :$canBuyDifficulty");
 
     money = money.copyWith(
       canUseBonusDifficulty: canBuyDifficulty,
       canUseBonusTime: canBuytime,
     );
-
+    print("quantité de dif $quantity et de time ${secondairDef.quantity} fin");
     return money;
   }
 
@@ -186,7 +191,12 @@ class MoneyService {
     } else {
       stateToUpdate = moneyState.copyWith(gemeStock: winGemme);
     }
+    final stateCkeckCanBuy = canAllUseBonus(stateToUpdate);
 
+    stateToUpdate = stateToUpdate.copyWith(
+      canUseBonusDifficulty: stateCkeckCanBuy.$2,
+      canUseBonusTime: stateCkeckCanBuy.$1,
+    );
     return stateToUpdate;
   }
 
@@ -205,10 +215,10 @@ class MoneyService {
     MoneyModel newState,
     MoneyModel oldState,
   ) async {
-        final moneyBox = Hive.box<MoneyModel>(Constants.moneyBox);
+    final moneyBox = Hive.box<MoneyModel>(Constants.moneyBox);
 
     try {
-      await moneyBox.put(0,newState);
+      await moneyBox.put(0, newState);
     } catch (e) {
       print("erreur de sauvegarde : $e");
       return ResultActionBonus(

@@ -61,11 +61,11 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
           dureeMax = ref
               .read(gameManagerProvider(widget.level).notifier)
               .maxCurrentValue;
-          print(dureeMax);
           controller.duration = Duration(seconds: dureeMax);
 
           controller.forward();
         } else if (next == TimerAction.win) {
+          print("finish game");
           controller.stop();
           ref
               .read(gameManagerProvider(widget.level).notifier)

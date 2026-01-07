@@ -8,15 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:logic_game/providers/money_provider.dart';
 
-class HomeBottomBar extends ConsumerWidget {
-  const HomeBottomBar({super.key});
+class HomeGame extends ConsumerWidget {
+  const HomeGame({super.key});
 
   // @override
-  // State<HomeBottomBar> createState() => _HomeBottomBarState();
+  // State<HomeGame> createState() => _HomeGameState();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // class _HomeBottomBarState extends State<HomeBottomBar> {
+    ref.watch(moneyProvider);
+    // class _HomeGameState extends State<HomeGame> {
     LevelModel levelTest = LevelModel(
       levelId: 10,
       cases: [
@@ -75,8 +76,7 @@ class HomeBottomBar extends ConsumerWidget {
 
     final money = ref.read(moneyProvider);
     final moneyBox = Hive.box<MoneyModel>(Constants.moneyBox);
-    moneyBox.put(0, money);
-    print(money.bestLevel);
+    // moneyBox.put(0, money);
 
     return Scaffold(
       appBar: AppBar(title: Text("Everyone")),
@@ -99,8 +99,8 @@ class HomeBottomBar extends ConsumerWidget {
               child: Text("Niveau test"),
             ),
             ElevatedButton(
-              onPressed: () {
-                moneyBox.delete(0);
+              onPressed: () async {
+                await moneyBox.delete(0);
               },
               child: Text("nettoyage de money"),
             ),
