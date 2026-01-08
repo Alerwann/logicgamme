@@ -8,6 +8,7 @@ import 'package:logic_game/models/hive/money/money_model.dart';
 import 'package:logic_game/models/tempory/session_state.dart';
 import 'package:logic_game/providers/message_provider.dart';
 import 'package:logic_game/services/hive_service.dart';
+import 'package:logic_game/services/game_manager_util.dart/init_game_manager.dart';
 import 'package:logic_game/services/money_service.dart';
 import 'package:logic_game/services/move_manager_service.dart';
 import 'package:flutter/foundation.dart';
@@ -43,73 +44,115 @@ class GameManager extends StateNotifier<SessionState> {
     this._ref,
     this._moveManageService, {
     required MoneyModel initialMoney,
-  }) : super(_calculerEtatInitial(levelPlaying, initialMoney)) {
-    // vérificaiton de sécurité
-    print("initialisation du manager");
+  }) : super(calculerEtatInitial(levelPlaying, initialMoney)) {
     if (initialMoney.canUseBonusDifficulty) {
       state = state.copyWith(statutPartie: EtatGame.waitDifficulty);
-      _stratWaitingDifficulty();
+      _waitDiff = stratWaitingDifficulty(state);
     } else {
       state = state.copyWith(statutPartie: EtatGame.isPlaying);
     }
   }
 
-  /// création de l'état initial de Session State
-  static SessionState _calculerEtatInitial(
-    LevelModel niveau,
-    MoneyModel money,
-  ) {
-    return SessionState(
-      levelConfig: niveau,
-      roadList: [niveau.firstCase],
-      // roadList: [CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1)],
-      roadSet: {niveau.firstCase},
-      // roadSet: {CaseModel(xValue: 0, yValue: 0, wallV: true, numberTag: 1)},
-      lastTagSave: 1,
-      statutPartie: EtatGame.loading,
-      difficultyMode: TypeDifficulty.normal,
-      moneyData: money,
-      timerState: TimerAction.init,
+  // Gestion de la partie et ses mouvements
+
+  /// A chaque mouvement envoie les informations à movemanager et affiche le message correspondant
+  ///
+  /// Pour que le joueur puisse jouer l'état doit être [isPlaying]
+  /// Ordone le lancement timer si c'est le premier mouvement
+
+  void handleMove(CaseModel newCase) {
+    MoveResult result;
+    _errorSetCase = {};
+
+    //Vérifications :
+    // état de jeu -> si le droit de jouer
+    // si le joueur appuie sur une case différente de la dernière
+    // PAs de mouvement autorisé si les conditions non respectées
+    if (state.statutPartie != EtatGame.isPlaying ||
+        state.roadList.last == newCase) {
+      return;
+    }
+
+    //nettoyage et initialisation
+    // Suprime la liste de case erronées pour qu'elles ne soient plus affichées
+    state = state.copyWith(
+      statutPartie: EtatGame.waitVerifRoad,
       error: ErrorPlayer.none,
-      stateGamePage: StateGamePage.playing,
     );
-  }
 
-  /// Mise en place du timer de prévisualisation de la grille
-  /// Il est lancé uniquement si le joueur à les moyen d'acheter le changement de difficulté
-  /// Une fois terminé passe en etat chooseDifficulty pour afficher le popup de choix
-  void _stratWaitingDifficulty() {
-    _waitDiff = Timer(
-      Duration(seconds: Constants.DURATION_PREVIEW_LEVEL),
-      () => state = state.copyWith(statutPartie: EtatGame.chooseDifficulty),
-    );
-  }
+    // Demande annulation du chemin
+    // peut etre fait avant l'iniatlisation car la road n'est que la case initiale donc évacué avant
+    if (state.roadSet.contains(newCase)) {
+      final newState = _moveManageService.cancelMove(state, newCase);
+      state = newState.copyWith(
+        statutPartie: EtatGame.isPlaying,
+        timerState: TimerAction.play,
+      );
+      return;
+    }
 
-  /// Vérification de la possibiliter de prendre un bonus de temps
-  /// appelé par timeBanner en fin de timer
+    //Envoie des donné au gestionnaire des routes -> vérif chemin ok
+    result = _moveManageService.handleMove(state, newCase);
 
-  void canUseBonus() {
-    ///modif en attendant popup
-    if (state.moneyData.canUseBonusTime) {
-      //lancement du popup et traitement de la rep
-      state = state.copyWith(statutPartie: EtatGame.chooseAddTime);
-    } else {
-      state = state.copyWith(stateGamePage: StateGamePage.loose);
+    final codeFeedback = result.statusCode;
+    final CaseModel? errorCase = result.errorCase;
+    final newState = result.sessionState;
+    final bool? wallError = result.wallError;
+
+    if (codeFeedback == MoveStatusCode.success) {
+      if (state.timerState == TimerAction.init) {
+        state = state.copyWith(timerState: TimerAction.play);
+      }
+      _startAnimationTimer(false, newState);
+    } else if (codeFeedback == MoveStatusCode.successlastTagCheck) {
+      _checkEndGame(newState);
+    } else
+    // Erreur du joueur dans sa technique
+    // séparation du wall car par la même animation du résultat
+    if (codeFeedback == MoveStatusCode.error ) {
+      _errorSetCase = errorCase != null ? {errorCase} : {};
+
+      final error = wallError!=null && wallError
+          ? ErrorPlayer.wall
+          : ErrorPlayer.other;
+
+      state = state.copyWith(statutPartie: EtatGame.isPlaying, error: error);
+    } else
+    // Gestion des 2 derniers cas qui eux devront déclancher une snackbarre
+    {
+      final String message = codeFeedback == MoveStatusCode.notOrthoError
+          ? "Le mouvement est soit horizontal soit vertical uniquement"
+          : "Erreur de l'application. Merci de contacter le créateur";
+
+      _ref.read(messageProvider.notifier).state = message;
+
+      state = state.copyWith(
+        statutPartie: EtatGame.isPlaying,
+        error: ErrorPlayer.snackbar,
+      );
     }
   }
 
-  /// fonction de mise en pause du timer sur demande du joueur
+  /// Si le joueur arrive à la dernière balise vérification du gain de la partie
   ///
-  /// passe l'état de la partie en pause
-  void pauseTime() {
-    state = state.copyWith(statutPartie: EtatGame.pause);
-  }
+  /// Si tout le tableau est rempli les sauvegardes sont appelées et passage en Win
+  /// Sinon retour comme quoi le tableau n'est pas remplis
 
-  /// Permet de redémarrer le timer après une pause
-  ///
-  /// repasse la partie en isPalaying
-  void resumeTime() {
-    state = state.copyWith(statutPartie: EtatGame.isPlaying);
+  void _checkEndGame(SessionState result) async {
+    if (result.roadList.length == state.levelConfig.cases.length) {
+
+      state = state.copyWith(timerState: TimerAction.win);
+
+      _result = result;
+    } else {
+      _errorSetCase = state.levelConfig.cases.toSet().difference(
+        state.roadSet.toSet(),
+      );
+      state = state.copyWith(
+        statutPartie: EtatGame.isPlaying,
+        error: ErrorPlayer.other,
+      );
+    }
   }
 
   /// Gestion du timer de l'animation du dessin
@@ -118,6 +161,7 @@ class GameManager extends StateNotifier<SessionState> {
   /// Paramètre :
   /// [endState] est l'état de la partie après l'animation soit en jeu soit en victoire
   /// [result] est l'état de la session après la vérification pour mettre à jour la route finale après l'animation
+
   void _startAnimationTimer(bool win, SessionState result) {
     print("start animation pour victoire? $win");
     const int tickMs = 20;
@@ -143,7 +187,7 @@ class GameManager extends StateNotifier<SessionState> {
                 dataPainting: null,
                 stateGamePage: StateGamePage.win,
                 statutPartie: EtatGame.win,
-                timerState: TimerAction.stop
+                timerState: TimerAction.stop,
               )
             : state = result.copyWith(
                 animationProgress: null,
@@ -154,26 +198,16 @@ class GameManager extends StateNotifier<SessionState> {
     });
   }
 
-  /// Permet le nettoyage des contrôleurs
-  @override
-  void dispose() {
-    _waitDiff?.cancel();
-    _waitDraw?.cancel();
-    super.dispose();
-  }
-
-  //gestion des scores de fin de partie
-
   Future<void> finishGame(int timeGame) async {
     print("win finish time: $timeGame");
-    await _saveRecord(timeGame);
+    await _saveRecord(timeGame, state);
     await _saveWinGame();
     _startAnimationTimer(true, _result);
   }
 
   /// Après vérification si le record est battut, envoie de la demande de sauvegarde
   ///
-  Future<void> _saveRecord(int timeGame) async {
+  Future<void> _saveRecord(int timeGame, SessionState state) async {
     if (state.levelConfig.bestRecordNormalSeconds > timeGame) {
       try {
         await _hiveService.saveRecord(state.levelConfig.levelId, timeGame);
@@ -214,105 +248,30 @@ class GameManager extends StateNotifier<SessionState> {
     }
   }
 
-  /// Si le joueur arrive à la dernière balise vérification du gain de la partie
+  /// Fonction appellé par le popup de choix d'achat de bonus
   ///
-  /// Si tout le tableau est rempli les sauvegardes sont appelées et passage en Win
-  /// Sinon retour comme quoi le tableau n'est pas remplis
+  /// Vérification de la possibiliter de prendre un bonus de temps
+  /// appelé par timeBanner en fin de timer
 
-  void _checkEndGame(SessionState result) async {
-    if (result.roadList.length == state.levelConfig.cases.length) {
-      print("win de checkend");
-      state = state.copyWith(timerState: TimerAction.win);
-
-      _result = result;
+  void canUseBonusTime() {
+    ///modif en attendant popup
+    if (state.moneyData.canUseBonusTime) {
+      //lancement du popup et traitement de la rep
+      state = state.copyWith(statutPartie: EtatGame.chooseAddTime);
     } else {
-      _errorSetCase = state.levelConfig.cases.toSet().difference(
-        state.roadSet.toSet(),
-      );
-      state = state.copyWith(
-        statutPartie: EtatGame.isPlaying,
-        error: ErrorPlayer.other,
-      );
+      state = state.copyWith(stateGamePage: StateGamePage.loose);
     }
   }
 
-  // Gestion de la partie et ses mouvements
-
-  /// A chaque mouvement envoie les informations à movemanager et affiche le message correspondant
-  ///
-  /// Pour que le joueur puisse jouer l'état doit être [isPlaying]
-  /// Ordone le lancement timer si c'est le premier mouvement
-
-  void handleMove(CaseModel newCase) {
-    MoveResult result;
-    _errorSetCase = {};
-
-    // vérificcation en mode jeu et qu'on
-    if (state.statutPartie != EtatGame.isPlaying ||
-        state.roadList.last == newCase) {
-      return;
-    }
-
-    //nettoyage et initialisation
-    state = state.copyWith(
-      statutPartie: EtatGame.waitVerifRoad,
-      error: ErrorPlayer.none,
-    );
-
-    // Demande annulation du chemin
-    // peut etre fait avant l'iniatlisation car la road n'est que la case initiale donc évacué avant
-    if (state.roadSet.contains(newCase)) {
-      final newState = _moveManageService.cancelMove(state, newCase);
-      state = newState.copyWith(statutPartie: EtatGame.isPlaying);
-      return;
-    }
-
-    //Envoue des donné au gestionnaire des routes
-    result = _moveManageService.handleMove(state, newCase);
-
-    final codeFeedback = result.statusCode;
-    final CaseModel? errorCase = result.errorCase;
-    final newState = result.sessionState;
-
-    if (codeFeedback == MoveStatusCode.success) {
-      if (state.timerState == TimerAction.init) {
-        state = state.copyWith(timerState: TimerAction.play);
-      }
-      _startAnimationTimer(false, newState);
-    } else if (codeFeedback == MoveStatusCode.successlastTagCheck) {
-      _checkEndGame(newState);
-    } else
-    // Erreur du joueur dans sa technique
-    // séparation du wall car par la même animation du résultat
-    if (codeFeedback == MoveStatusCode.otherError ||
-        codeFeedback == MoveStatusCode.wallError) {
-      _errorSetCase = errorCase != null ? {errorCase} : {};
-
-      final error = codeFeedback == MoveStatusCode.wallError
-          ? ErrorPlayer.wall
-          : ErrorPlayer.other;
-
-      state = state.copyWith(statutPartie: EtatGame.isPlaying, error: error);
-    } else
-    // Gestion des 2 derniers cas qui eux devront déclancher une snackbarre
-    {
-      final String message = codeFeedback == MoveStatusCode.notOrthoError
-          ? "Le mouvement est soit horizontal soit vertical uniquement"
-          : "Erreur de l'application. Merci de contacter le créateur";
-
-      _ref.read(messageProvider.notifier).state = message;
-
-      state = state.copyWith(
-        statutPartie: EtatGame.isPlaying,
-        error: ErrorPlayer.snackbar,
-      );
+  void bonusAll(TypeBonus bonus, bool addIt) {
+    switch (bonus) {
+      case TypeBonus.bonusTime:
+        _addTimechoose(addIt);
+      case TypeBonus.bonusDifficulty:
+        _difficultyChoose(addIt);
     }
   }
 
-  //Fonctions appelé par la validation des popup
-
-  /// Fonction appellé par le popup de choix de difficulté
-  ///
   /// paramètre [chooseHard] est true si le joueur change le niveau false sinon
   /// Si le joueur refuse le changelment le statut de la partie passe en isplayin directement
   /// Modification de l'état de la partie si l'achat et la sauvegarde à réussi  et envoie du message à afficher
@@ -394,14 +353,23 @@ class GameManager extends StateNotifier<SessionState> {
     }
   }
 
-  void bonusAll(TypeBonus bonus, bool addIt) {
-    switch (bonus) {
-      case TypeBonus.bonusTime:
-        _addTimechoose(addIt);
-      case TypeBonus.bonusDifficulty:
-        _difficultyChoose(addIt);
-    }
+
+  /// fonction de la pause du timer sur demande du joueur
+  ///si actuellement en pause passe en jeu et inversement
+  
+  void pauseResumeTime(bool isPause) {
+    final newStatue = isPause ? EtatGame.isPlaying : EtatGame.pause;
+
+    state = state.copyWith(statutPartie: newStatue);
+  }
+
+
+  /// Permet le nettoyage des contrôleurs
+
+  @override
+  void dispose() {
+    _waitDiff?.cancel();
+    _waitDraw?.cancel();
+    super.dispose();
   }
 }
-
-

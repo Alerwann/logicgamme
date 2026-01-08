@@ -1,6 +1,5 @@
 import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:logic_game/providers/game_manager_provider.dart';
-import 'package:logic_game/services/game_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

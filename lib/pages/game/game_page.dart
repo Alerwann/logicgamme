@@ -1,7 +1,7 @@
 import 'package:logic_game/data/enum/enum.dart';
 import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:logic_game/pages/game/game_main_layout.dart';
-import 'package:logic_game/services/game_manager.dart';
+import 'package:logic_game/providers/game_manager_provider.dart';
 import 'package:logic_game/widget/gamepage/end%20game/loose_result.dart';
 import 'package:logic_game/widget/gamepage/end%20game/win_result.dart';
 import 'package:logic_game/widget/gamepage/game%20events%20listener/game_events_listener.dart';

@@ -90,7 +90,7 @@ class MoveManagerService {
     if (resultAllreadyPass.$1) {
       return MoveResult(
         sessionState: state,
-        statusCode: MoveStatusCode.otherError,
+        statusCode: MoveStatusCode.error,
         errorCase: resultAllreadyPass.$2,
       );
     }
@@ -101,7 +101,7 @@ class MoveManagerService {
     if (!resultTagTest.goodOrder) {
       return MoveResult(
         sessionState: state,
-        statusCode: MoveStatusCode.otherError,
+        statusCode: MoveStatusCode.error,
         errorCase: resultTagTest.errorCase,
       );
     }
@@ -120,7 +120,8 @@ class MoveManagerService {
     if (resultTestWall.$1) {
       return MoveResult(
         sessionState: state,
-        statusCode: MoveStatusCode.wallError,
+        statusCode: MoveStatusCode.error,
+        wallError: true,
         errorCase: resultTestWall.$2,
       );
     }
@@ -405,9 +406,13 @@ class MoveResult {
   /// Retourne si nécessaire la casse qui a causé l'erreur
   final CaseModel? errorCase;
 
+  /// Retourne un bool en cas d'erreur de mur
+  final bool? wallError;
+
   MoveResult({
     required this.sessionState,
     required this.statusCode,
     this.errorCase,
+    this.wallError,
   });
 }

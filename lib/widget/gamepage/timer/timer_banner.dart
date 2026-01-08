@@ -2,7 +2,6 @@ import 'package:logic_game/data/constants.dart';
 import 'package:logic_game/data/enum/enum.dart';
 import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:logic_game/providers/game_manager_provider.dart';
-import 'package:logic_game/services/game_manager.dart';
 import 'package:logic_game/widget/gamepage/timer/format_time.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,7 +42,7 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
         initCompteurValue = timeValue + 1;
         controller.reset();
         final notifier = ref.read(gameManagerProvider(widget.level).notifier);
-        notifier.canUseBonus();
+        notifier.canUseBonusTime();
       }
     });
   }
@@ -126,18 +125,10 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
           ),
           IconButton(
             onPressed: () {
-              if (pauseAction) {
-                ref
-                    .read(gameManagerProvider(widget.level).notifier)
-                    .resumeTime();
-                controller.forward();
-              } else {
-                ref
-                    .read(gameManagerProvider(widget.level).notifier)
-                    .pauseTime();
-                controller.stop();
-              }
-
+              ref
+                  .read(gameManagerProvider(widget.level).notifier)
+                  .pauseResumeTime(pauseAction);
+              pauseAction ? controller.forward() : controller.stop();
               setState(() {
                 pauseAction = !pauseAction;
               });

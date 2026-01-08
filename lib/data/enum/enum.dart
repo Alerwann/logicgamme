@@ -45,8 +45,8 @@ enum MoveStatusCode {
   /// Mouvement sans obstacle et la dernoère balise est atteinte(demi victoire)
   successlastTagCheck,
 
-  /// le chemin traverse un mur
-  wallError,
+  /// erreur nécisstant une modif de l'ui
+  error,
 
   /// le chemin est en diagonale
   notOrthoError,
@@ -54,8 +54,6 @@ enum MoveStatusCode {
   /// erreur lors de la création des chemins  interne au chargement de niveau
   internalError,
 
-  /// autres erreur possibles
-  otherError,
 }
 
 enum ErrorPlayer { wall, other, none, snackbar }
