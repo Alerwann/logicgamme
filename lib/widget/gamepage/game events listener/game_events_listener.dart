@@ -3,6 +3,7 @@ import 'package:logic_game/data/enum/enum.dart';
 import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
 import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:logic_game/models/models%20utils/result_dialogue_bonus.dart';
+import 'package:logic_game/providers/game_manager_provider.dart';
 import 'package:logic_game/providers/message_provider.dart';
 import 'package:logic_game/services/game_manager.dart';
 import 'package:flutter/material.dart';

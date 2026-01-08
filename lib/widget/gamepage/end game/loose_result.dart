@@ -13,7 +13,21 @@ class LooseResult extends StatelessWidget {
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
-      body: Center(child: Text('Tu as perdu')),
+      body: Center(
+        child: Column(
+          children: [
+            Text("Le temps est écoulé..."),
+            Text(
+              "Essaie de nouveau le niveau, ou entraine toi sur les anciens",
+            ),
+            ElevatedButton(onPressed: () {
+              
+            }, child: Text("Rejouer")),
+            ElevatedButton(onPressed: () {}, child: Text("Liste des niveaux")),
+            ElevatedButton(onPressed: () {}, child: Text("Accueil")),
+          ],
+        ),
+      ),
     );
   }
 }
