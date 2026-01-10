@@ -1,4 +1,4 @@
-import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/models/hive/box/level/level_model.dart';
 import 'package:flutter/material.dart';
 
 class CaseWidget extends StatelessWidget {
@@ -8,6 +8,7 @@ class CaseWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final BorderSide borderDeco = BorderSide(color: Colors.black, width: 5);
+  
 
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),

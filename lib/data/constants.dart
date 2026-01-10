@@ -1,10 +1,11 @@
 // ignore_for_file: constant_identifier_names
 
-import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
+import 'package:logic_game/models/hive/noBox/typebonus/type_bonus.dart';
 
 class Constants {
   static const String levelBox = 'levelsBox';
   static const String moneyBox = 'moneyBox';
+  static const String levelProfilBox = 'levelProfilBox';
 
   static const int DURATION_PREVIEW_LEVEL = 2;
   static const int DURATION_DRAWING_MS = 500;
@@ -13,7 +14,7 @@ class Constants {
     TypeBonus.bonusTime,
     TypeBonus.bonusDifficulty,
   ];
-  
+
   //BASIC DATA
   static const int GAIN_GEMME = 100;
   static const int DURATION_NORMAL_MODE = 10;

@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:logic_game/data/constants.dart';
-import 'package:logic_game/models/hive/bonus/bonus_model.dart';
-import 'package:logic_game/models/hive/money/money_model.dart';
+import 'package:logic_game/models/hive/noBox/bonus/bonus_model.dart';
+import 'package:logic_game/models/hive/box/money/money_model.dart';
 import 'package:logic_game/models/models%20utils/result_can_buy.dart';
 
 class MoneyService {

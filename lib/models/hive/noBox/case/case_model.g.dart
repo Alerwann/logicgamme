@@ -1,47 +1,44 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'level_model.dart';
+part of 'case_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class LevelModelAdapter extends TypeAdapter<LevelModel> {
+class CaseModelAdapter extends TypeAdapter<CaseModel> {
   @override
-  final int typeId = 1;
+  final int typeId = 10;
 
   @override
-  LevelModel read(BinaryReader reader) {
+  CaseModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return LevelModel(
-      levelId: fields[0] as int,
-      cases: (fields[1] as List).cast<CaseModel>(),
-      firstCase: fields[2] as CaseModel,
-      maxTag: fields[3] as int,
-      size: fields[4] as int,
-      bestRecordNormalSeconds: fields[5] as int,
+    return CaseModel(
+      xValue: fields[0] as int,
+      yValue: fields[1] as int,
+      wallH: fields[2] as bool?,
+      wallV: fields[3] as bool?,
+      numberTag: fields[4] as int?,
     );
   }
 
   @override
-  void write(BinaryWriter writer, LevelModel obj) {
+  void write(BinaryWriter writer, CaseModel obj) {
     writer
-      ..writeByte(6)
-      ..writeByte(0)
-      ..write(obj.levelId)
-      ..writeByte(1)
-      ..write(obj.cases)
-      ..writeByte(2)
-      ..write(obj.firstCase)
-      ..writeByte(3)
-      ..write(obj.maxTag)
-      ..writeByte(4)
-      ..write(obj.size)
       ..writeByte(5)
-      ..write(obj.bestRecordNormalSeconds);
+      ..writeByte(0)
+      ..write(obj.xValue)
+      ..writeByte(1)
+      ..write(obj.yValue)
+      ..writeByte(2)
+      ..write(obj.wallH)
+      ..writeByte(3)
+      ..write(obj.wallV)
+      ..writeByte(4)
+      ..write(obj.numberTag);
   }
 
   @override
@@ -50,7 +47,7 @@ class LevelModelAdapter extends TypeAdapter<LevelModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is LevelModelAdapter &&
+      other is CaseModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

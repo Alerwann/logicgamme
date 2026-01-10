@@ -1,7 +1,9 @@
+import 'package:hive/hive.dart';
+import 'package:logic_game/data/constants.dart';
 import 'package:logic_game/data/enum/enum.dart';
-import 'package:logic_game/models/hive/case/case_model.dart';
+import 'package:logic_game/models/hive/noBox/case/case_model.dart';
 import 'package:logic_game/models/models%20utils/data_for_painting.dart';
-import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/models/hive/box/level/level_model.dart';
 import 'package:logic_game/models/tempory/session_state.dart';
 
 /// Service de gestion et vérification des mouvements pendant le jeu
@@ -48,6 +50,8 @@ class MoveManagerService {
   MoveResult handleMove(SessionState state, CaseModel newCase) {
     final CaseModel lastCase = state.roadList.last;
 
+    final level = Hive.box<LevelModel>(Constants.levelBox).get(state.levelId)!;
+
     bool lastBaliseCheck = false;
     int currentTagIndex = state.lastTagSave;
 
@@ -56,6 +60,8 @@ class MoveManagerService {
 
     /// retourne une erreur si le mouvement est en diagonal
     if (!directionData.ortho) {
+      print("notOrtho ${newCase.xValue}");
+
       return MoveResult(
         sessionState: state,
         statusCode: MoveStatusCode.notOrthoError,
@@ -69,7 +75,7 @@ class MoveManagerService {
     /// création de la liste des cases qui sont parcourus pendant le chemin
     final casesList = createListCasesTest(
       newCase,
-      state.levelConfig,
+      level,
       state.roadList,
       typeMove,
       direction,
@@ -77,6 +83,8 @@ class MoveManagerService {
 
     /// si liste crée inférieur à la liste espérée -> problème de chargement
     if (casesList.length != expectedLength) {
+      print("internal ${newCase.xValue}");
+
       return MoveResult(
         sessionState: state,
         statusCode: MoveStatusCode.internalError,
@@ -88,6 +96,8 @@ class MoveManagerService {
     final resultAllreadyPass = testAlreadyPass(state.roadSet, casesList);
 
     if (resultAllreadyPass.$1) {
+      print("readypass ${newCase.xValue}");
+
       return MoveResult(
         sessionState: state,
         statusCode: MoveStatusCode.error,
@@ -99,6 +109,8 @@ class MoveManagerService {
     final resultTagTest = testOderTag(state.lastTagSave, casesList);
 
     if (!resultTagTest.goodOrder) {
+      print("goodorder ${newCase.xValue}");
+
       return MoveResult(
         sessionState: state,
         statusCode: MoveStatusCode.error,
@@ -108,7 +120,8 @@ class MoveManagerService {
 
     currentTagIndex = resultTagTest.lastTag;
 
-    if (currentTagIndex == state.levelConfig.maxTag) {
+    if (currentTagIndex == level.maxTag) {
+ 
       lastBaliseCheck = true;
     }
 
@@ -118,6 +131,8 @@ class MoveManagerService {
     final resultTestWall = testWall(allPathCases, direction, typeMove);
 
     if (resultTestWall.$1) {
+      print("if last wall ${newCase.xValue}");
+
       return MoveResult(
         sessionState: state,
         statusCode: MoveStatusCode.error,
@@ -137,6 +152,7 @@ class MoveManagerService {
     );
 
     if (lastBaliseCheck) {
+
       return MoveResult(
         sessionState: newState,
         statusCode: MoveStatusCode.successlastTagCheck,

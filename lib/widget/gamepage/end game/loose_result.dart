@@ -1,12 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:flutter/material.dart';
 import 'package:logic_game/pages/home/home_game.dart';
 import 'package:logic_game/pages/list_level.dart';
 import 'package:logic_game/providers/game_manager_provider.dart';
 
 class LooseResult extends ConsumerWidget {
-  final LevelModel level;
+  final int level;
   const LooseResult({super.key, required this.level});
 
   @override

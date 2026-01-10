@@ -1,44 +1,38 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'case_model.dart';
+part of 'level_profil_model.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class CaseModelAdapter extends TypeAdapter<CaseModel> {
+class LevelProfilModelAdapter extends TypeAdapter<LevelProfilModel> {
   @override
   final int typeId = 2;
 
   @override
-  CaseModel read(BinaryReader reader) {
+  LevelProfilModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return CaseModel(
-      xValue: fields[0] as int,
-      yValue: fields[1] as int,
-      wallH: fields[2] as bool?,
-      wallV: fields[3] as bool?,
-      numberTag: fields[4] as int?,
+    return LevelProfilModel(
+      levelId: fields[0] as int,
+      bestTime: fields[1] as int,
+      winWithHard: fields[2] as bool,
     );
   }
 
   @override
-  void write(BinaryWriter writer, CaseModel obj) {
+  void write(BinaryWriter writer, LevelProfilModel obj) {
     writer
-      ..writeByte(5)
-      ..writeByte(0)
-      ..write(obj.xValue)
-      ..writeByte(1)
-      ..write(obj.yValue)
-      ..writeByte(2)
-      ..write(obj.wallH)
       ..writeByte(3)
-      ..write(obj.wallV)
-      ..writeByte(4)
-      ..write(obj.numberTag);
+      ..writeByte(0)
+      ..write(obj.levelId)
+      ..writeByte(1)
+      ..write(obj.bestTime)
+      ..writeByte(2)
+      ..write(obj.winWithHard);
   }
 
   @override
@@ -47,7 +41,7 @@ class CaseModelAdapter extends TypeAdapter<CaseModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CaseModelAdapter &&
+      other is LevelProfilModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

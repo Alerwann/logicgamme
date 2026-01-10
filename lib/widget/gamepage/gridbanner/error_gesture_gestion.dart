@@ -1,6 +1,6 @@
 import 'package:logic_game/data/enum/enum.dart';
-import 'package:logic_game/models/hive/case/case_model.dart';
-import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/models/hive/noBox/case/case_model.dart';
+import 'package:logic_game/models/hive/box/level/level_model.dart';
 import 'package:logic_game/providers/game_manager_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,10 +30,10 @@ class ErrorGestureGestion extends ConsumerWidget {
       );
     }
 
-    final error = ref.watch(gameManagerProvider(level).select((s) => s.error));
+    final error = ref.watch(gameManagerProvider(level.levelId).select((s) => s.error));
 
     if (error == ErrorPlayer.wall || error == ErrorPlayer.other) {
-      errorCases = ref.read(gameManagerProvider(level).notifier).errorSetCase;
+      errorCases = ref.read(gameManagerProvider(level.levelId).notifier).errorSetCase;
 
       borderFinal = error == ErrorPlayer.wall
           ? borderWallError(errorCases.first)
@@ -58,7 +58,7 @@ class ErrorGestureGestion extends ConsumerWidget {
 
         return GestureDetector(
           onTap: () => ref
-              .read(gameManagerProvider(level).notifier)
+              .read(gameManagerProvider(level.levelId).notifier)
               .handleMove(levelCaseData),
           child: Container(decoration: deco, child: SizedBox()),
         );

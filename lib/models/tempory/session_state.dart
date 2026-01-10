@@ -1,7 +1,6 @@
 import 'package:logic_game/data/enum/enum.dart';
-import 'package:logic_game/models/hive/case/case_model.dart';
+import 'package:logic_game/models/hive/noBox/case/case_model.dart';
 import 'package:logic_game/models/models%20utils/data_for_painting.dart';
-import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:flutter/foundation.dart';
 
 /// Réprésente l'état de la partie à un instant t
@@ -11,8 +10,12 @@ import 'package:flutter/foundation.dart';
 ///
 
 class SessionState {
-  /// Model du niveau joué Pour tous
-  final LevelModel levelConfig;
+  /// id du niveau joué Pour tous
+  final int levelId;
+
+  final int levelSize;
+
+  final CaseModel firstCase;
   //game
   /// List des cases qui ont été parcouru par le joueur
   /// Est initialisé avec [firstCase] du [levelConfig]
@@ -54,7 +57,9 @@ class SessionState {
   final StateGamePage stateGamePage;
 
   SessionState({
-    required this.levelConfig,
+    required this.levelId,
+    required this.levelSize,
+    required this.firstCase,
     required this.roadList,
     required this.roadSet,
     required this.lastTagSave,
@@ -76,7 +81,9 @@ class SessionState {
 
   ///Utilise la copy pour te pas casser l'immuabilité du modèle
   SessionState copyWith({
-    LevelModel? levelConfig,
+    int? levelId,
+    int? levelSize,
+    CaseModel? firstCase,
     List<CaseModel>? roadList,
     Set<CaseModel>? roadSet,
     int? lastTagSave,
@@ -90,7 +97,9 @@ class SessionState {
     StateGamePage? stateGamePage,
   }) {
     return SessionState(
-      levelConfig: levelConfig ?? this.levelConfig,
+      levelId: levelId ?? this.levelId,
+      levelSize: levelSize ?? this.levelSize,
+      firstCase: firstCase ?? this.firstCase,
       roadList: roadList ?? this.roadList,
       roadSet: roadSet ?? this.roadSet,
       lastTagSave: lastTagSave ?? this.lastTagSave,
@@ -113,7 +122,9 @@ class SessionState {
       identical(this, other) ||
       other is SessionState &&
           runtimeType == other.runtimeType &&
-          levelConfig == other.levelConfig &&
+          levelId == other.levelId &&
+          levelSize == other.levelSize &&
+          firstCase == other.firstCase &&
           listEquals(roadList, other.roadList) &&
           setEquals(roadSet, other.roadSet) &&
           lastTagSave == other.lastTagSave &&
@@ -127,7 +138,9 @@ class SessionState {
 
   @override
   int get hashCode => Object.hash(
-    levelConfig,
+    levelId,
+    levelSize,
+    firstCase,
     Object.hashAll(roadList),
     Object.hashAll(roadSet),
     statutPartie,

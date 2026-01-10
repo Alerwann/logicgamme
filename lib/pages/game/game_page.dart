@@ -1,5 +1,4 @@
 import 'package:logic_game/data/enum/enum.dart';
-import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:logic_game/pages/game/game_main_layout.dart';
 import 'package:logic_game/providers/game_manager_provider.dart';
 import 'package:logic_game/widget/gamepage/end%20game/loose_result.dart';
@@ -9,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class GamePage extends ConsumerWidget {
-  final LevelModel level;
+  final int level;
   const GamePage({super.key, required this.level});
 
   @override
@@ -28,7 +27,7 @@ class GamePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildBody(StateGamePage status, LevelModel level) {
+  Widget _buildBody(StateGamePage status, int level) {
     switch (status) {
       case StateGamePage.playing:
         return GameMainLayout(level: level);

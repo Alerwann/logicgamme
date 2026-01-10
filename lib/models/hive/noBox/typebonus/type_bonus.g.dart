@@ -8,7 +8,7 @@ part of 'type_bonus.dart';
 
 class TypeBonusAdapter extends TypeAdapter<TypeBonus> {
   @override
-  final int typeId = 10;
+  final int typeId = 12;
 
   @override
   TypeBonus read(BinaryReader reader) {

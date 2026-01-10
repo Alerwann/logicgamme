@@ -1,10 +1,10 @@
 import 'package:hive/hive.dart';
-import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
+import 'package:logic_game/models/hive/noBox/typebonus/type_bonus.dart';
 
 part 'bonus_model.g.dart';
 
 /// définition de la classe de bonus et de leur propriété
-@HiveType(typeId: 3)
+@HiveType(typeId: 11)
 class BonusModel {
   /// le typeBonus est une énumération des bonus disponibles
   @HiveField(0)

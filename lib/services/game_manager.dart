@@ -1,16 +1,16 @@
 import 'dart:async';
+import 'package:hive/hive.dart';
 import 'package:logic_game/data/constants.dart';
 import 'package:logic_game/data/enum/enum.dart';
-import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
-import 'package:logic_game/models/hive/case/case_model.dart';
-import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/models/hive/noBox/typebonus/type_bonus.dart';
+import 'package:logic_game/models/hive/noBox/case/case_model.dart';
+import 'package:logic_game/models/hive/box/level/level_model.dart';
 import 'package:logic_game/models/tempory/session_state.dart';
+import 'package:logic_game/providers/level_profil_provider.dart';
 import 'package:logic_game/providers/message_provider.dart';
 import 'package:logic_game/providers/money_provider.dart';
-import 'package:logic_game/services/hive_service.dart';
 import 'package:logic_game/services/money_service.dart';
 import 'package:logic_game/services/move_manager_service.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Service central de la gestion globale de la partie
@@ -31,23 +31,21 @@ class GameManager extends StateNotifier<SessionState> {
   Set<CaseModel> _errorSetCase = {};
   Set<CaseModel> get errorSetCase => _errorSetCase;
 
-  final HiveService _hiveService;
   final MoveManagerService _moveManageService;
 
   bool _newRecord = false;
   bool get newRecord => _newRecord;
 
   ///initialisation de la classe
-  GameManager(
-    LevelModel levelPlaying,
-    this._hiveService,
-    this._ref,
-    this._moveManageService,
-  ) : super(_calculerEtatInitial(levelPlaying)) {
+  GameManager(int levelPlaying, this._ref, this._moveManageService)
+    : super(_calculerEtatInitial(levelPlaying)) {
+    _startGame();
+  }
+
+  void _startGame() {
     final initialMoney = _ref.read(moneyProvider);
 
     if (initialMoney.canUseBonusDifficulty) {
-      
       state = state.copyWith(statutPartie: EtatGame.waitDifficulty);
 
       _waitDiff = Timer(
@@ -60,11 +58,16 @@ class GameManager extends StateNotifier<SessionState> {
   }
 
   /// Initialisation de l'état
-  static SessionState _calculerEtatInitial(LevelModel niveau) {
+  static SessionState _calculerEtatInitial(int niveau) {
+    final level = Hive.box<LevelModel>(Constants.levelBox).get(niveau)!;
+    final firstCase = level.firstCase;
+    final size = level.size;
     return SessionState(
-      levelConfig: niveau,
-      roadList: [niveau.firstCase],
-      roadSet: {niveau.firstCase},
+      levelId: niveau,
+      levelSize: size,
+      firstCase: firstCase,
+      roadList: [firstCase],
+      roadSet: {firstCase},
       lastTagSave: 1,
       statutPartie: EtatGame.loading,
       difficultyMode: TypeDifficulty.normal,
@@ -126,6 +129,7 @@ class GameManager extends StateNotifier<SessionState> {
       }
       _startAnimationTimer(false, newState);
     } else if (codeFeedback == MoveStatusCode.successlastTagCheck) {
+      print("gamemanager test lastGame");
       _checkEndGame(newState);
     } else
     // Erreur du joueur dans sa technique
@@ -160,14 +164,16 @@ class GameManager extends StateNotifier<SessionState> {
   /// Sinon retour comme quoi le tableau n'est pas remplis
 
   void _checkEndGame(SessionState result) async {
-    if (result.roadList.length == state.levelConfig.cases.length) {
+    final cases = Hive.box<LevelModel>(
+      Constants.levelBox,
+    ).get(state.levelId)!.cases;
+    if (result.roadList.length == cases.length) {
       state = state.copyWith(timerState: TimerAction.win);
 
       _result = result;
     } else {
-      _errorSetCase = state.levelConfig.cases.toSet().difference(
-        state.roadSet.toSet(),
-      );
+      final setCases = cases.toSet();
+      _errorSetCase = setCases.difference(state.roadSet);
       state = state.copyWith(
         statutPartie: EtatGame.isPlaying,
         error: ErrorPlayer.other,
@@ -220,6 +226,7 @@ class GameManager extends StateNotifier<SessionState> {
 
   Future<void> finishGame(int timeGame) async {
     print("win finish time: $timeGame");
+
     await _saveRecord(timeGame, state);
     await _saveWinGame();
     _startAnimationTimer(true, _result);
@@ -228,19 +235,18 @@ class GameManager extends StateNotifier<SessionState> {
   /// Après vérification si le record est battut, envoie de la demande de sauvegarde
   ///
   Future<void> _saveRecord(int timeGame, SessionState state) async {
-    if (state.levelConfig.bestRecordNormalSeconds > timeGame) {
-      _newRecord = true;
-      try {
-        await _hiveService.saveRecord(state.levelConfig.levelId, timeGame);
-      } catch (e) {
-        _ref.read(messageProvider.notifier).state =
-            "Erreur lors de la sauvegarde du record. Contacter le support.";
-        if (kDebugMode) {
-          print("Erreur de la demande de sauvegarde du record : $e");
-        }
-      }
-    } else {
-      _newRecord = false;
+    final levelId = state.levelId;
+    final difficulty = state.difficultyMode;
+
+    final levelData = await _ref
+        .read(levelProfilProvider(levelId).notifier)
+        .saveEndGame(timeGame, difficulty);
+
+    _newRecord = levelData.record;
+
+    if (!levelData.save) {
+      _ref.read(messageProvider.notifier).state =
+          "Erreur lors de la sauvegarde du record. Contacter le support.";
     }
   }
 
@@ -251,7 +257,7 @@ class GameManager extends StateNotifier<SessionState> {
 
     final majEndGame = await moneyP.majMoneyEndGame(
       state.difficultyMode,
-      state.levelConfig.levelId,
+      state.levelId,
     );
     if (!majEndGame) {
       _ref.read(messageProvider.notifier).state =
@@ -332,21 +338,20 @@ class GameManager extends StateNotifier<SessionState> {
     if (!chooseTime) {
       state = state.copyWith(stateGamePage: StateGamePage.loose);
     } else {
-     final moneyP = _ref.read(moneyProvider.notifier);
+      final moneyP = _ref.read(moneyProvider.notifier);
 
       final resultBuy = await moneyP.buyTime();
-        if (resultBuy) {
-          state = state.copyWith(
-            difficultyMode: TypeDifficulty.normal,
-            statutPartie: EtatGame.isPlaying,
-            timerState: TimerAction.addTime,
-          );
-        }
-     else{
+      if (resultBuy) {
+        state = state.copyWith(
+          difficultyMode: TypeDifficulty.normal,
+          statutPartie: EtatGame.isPlaying,
+          timerState: TimerAction.addTime,
+        );
+      } else {
         state = state.copyWith(stateGamePage: StateGamePage.loose);
         _ref.read(messageProvider.notifier).state =
             "Achat du temps non finalisée, la partie est terminée";
-      }   
+      }
     }
   }
 
@@ -364,14 +369,15 @@ class GameManager extends StateNotifier<SessionState> {
 
   void resetForReplay() {
     state = state.copyWith(
-      roadList: [state.levelConfig.firstCase],
-      roadSet: {state.levelConfig.firstCase},
+      roadList: [state.firstCase],
+      roadSet: {state.firstCase},
       lastTagSave: 1,
       statutPartie: EtatGame.loading,
       difficultyMode: TypeDifficulty.normal,
       stateGamePage: StateGamePage.playing,
       timerState: TimerAction.init,
     );
+    _startGame();
   }
 
   @override

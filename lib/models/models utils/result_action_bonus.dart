@@ -1,5 +1,5 @@
 import 'package:logic_game/data/enum/enum.dart';
-import 'package:logic_game/models/hive/money/money_model.dart';
+import 'package:logic_game/models/hive/box/money/money_model.dart';
 
 class ResultActionBonus {
   /// vrai si l'action est faite et finalisée sinon faux

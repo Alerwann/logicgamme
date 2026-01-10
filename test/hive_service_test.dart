@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
-import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/models/hive/box/level/level_model.dart';
 
 void main() {
   late Directory tempDir;

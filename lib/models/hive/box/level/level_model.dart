@@ -1,4 +1,4 @@
-import 'package:logic_game/models/hive/case/case_model.dart';
+import 'package:logic_game/models/hive/noBox/case/case_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -25,18 +25,12 @@ class LevelModel extends HiveObject {
   @HiveField(4)
   int size;
 
-  /// Quand le joueur à gagné un niveau son temps est enregistré
-  /// Il peut ainsi le rejouer pour l'améliorer et battre son record
-  @HiveField(5)
-  late int bestRecordNormalSeconds;
-
   LevelModel({
     required this.levelId,
     required this.cases,
     required this.firstCase,
     required this.maxTag,
     required this.size,
-    this.bestRecordNormalSeconds = 99999,
   });
 
   LevelModel copyWith({
@@ -45,7 +39,6 @@ class LevelModel extends HiveObject {
     CaseModel? firstCase,
     int? maxTag,
     int? size,
-    int? bestRecordNormalSeconds,
   }) {
     return LevelModel(
       levelId: levelId ?? this.levelId,
@@ -66,7 +59,6 @@ class LevelModel extends HiveObject {
           runtimeType == other.runtimeType &&
           levelId == other.levelId &&
           listEquals(cases, other.cases) &&
-          bestRecordNormalSeconds == other.bestRecordNormalSeconds &&
           firstCase == other.firstCase &&
           maxTag == other.maxTag &&
           size == other.size;
@@ -76,7 +68,6 @@ class LevelModel extends HiveObject {
   int get hashCode => Object.hash(
     levelId,
     Object.hashAll(cases),
-    bestRecordNormalSeconds,
     firstCase,
     maxTag,
     size,

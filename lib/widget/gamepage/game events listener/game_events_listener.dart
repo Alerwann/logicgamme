@@ -1,7 +1,6 @@
 import 'package:logic_game/data/constants.dart';
 import 'package:logic_game/data/enum/enum.dart';
-import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
-import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/models/hive/noBox/typebonus/type_bonus.dart';
 import 'package:logic_game/models/models%20utils/result_dialogue_bonus.dart';
 import 'package:logic_game/providers/game_manager_provider.dart';
 import 'package:logic_game/providers/message_provider.dart';
@@ -10,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logic_game/providers/money_provider.dart';
 
 class GameEventsListener extends ConsumerWidget {
-  final LevelModel level;
+  final int level;
   const GameEventsListener({super.key, required this.level});
 
   @override
@@ -42,7 +41,7 @@ class GameEventsListener extends ConsumerWidget {
   void _showDifficultyPopup(
     BuildContext context,
     WidgetRef ref,
-    LevelModel level,
+    int level,
     ResultDialogueBonus dataBonus,
   ) {
     showDialog(
@@ -85,7 +84,7 @@ class GameEventsListener extends ConsumerWidget {
     );
   }
 
-  void _initTimeMessage(BuildContext context, WidgetRef ref, LevelModel level) {
+  void _initTimeMessage(BuildContext context, WidgetRef ref, int level) {
     final money = ref.read(moneyProvider);
     final bonusTime = money.timeBonus;
     final quantity = bonusTime.quantity;
@@ -111,7 +110,7 @@ class GameEventsListener extends ConsumerWidget {
     _showDifficultyPopup(context, ref, level, timeBonus);
   }
 
-  void _initDifficulty(BuildContext context, WidgetRef ref, LevelModel level) {
+  void _initDifficulty(BuildContext context, WidgetRef ref, int level) {
     final money = ref.read(moneyProvider);
 
     final bonusDifficulty = money.difficultyBonus;

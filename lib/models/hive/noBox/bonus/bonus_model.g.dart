@@ -8,7 +8,7 @@ part of 'bonus_model.dart';
 
 class BonusModelAdapter extends TypeAdapter<BonusModel> {
   @override
-  final int typeId = 3;
+  final int typeId = 11;
 
   @override
   BonusModel read(BinaryReader reader) {

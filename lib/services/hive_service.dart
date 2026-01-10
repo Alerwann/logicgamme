@@ -3,10 +3,9 @@ import 'package:logic_game/data/constants.dart';
 import 'package:logic_game/data/enum/enum.dart';
 import 'package:logic_game/data/levels_import/all_level_list.dart';
 import 'package:logic_game/data/levels_import/levels_import_model.dart';
-import 'package:logic_game/models/hive/case/case_model.dart';
-import 'package:logic_game/models/hive/level/level_model.dart';
+import 'package:logic_game/models/hive/noBox/case/case_model.dart';
+import 'package:logic_game/models/hive/box/level/level_model.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
 
 /// Service qui gère la création et la sauvegarde des niveaux
@@ -63,34 +62,7 @@ class HiveService {
     return (true, "Les niveaux ont été initialisé, Bonne chance");
   }
 
-  /// Fonction qui permet de mettre à jour le record du joueur dans le [LevelModel] du niveau
-  ///
-  /// Paramètre:
-  ///   [levelId] est l'id du niveau pour le retrouver dans la box
-  ///   [newTimeInSeconds] est le temps à enregistrer
-  ///
-  /// Fonction asynchrone pour être sur que la sauvegarde soit à jour avant de continuer
-  ///
-  /// Retourne un bool qui est vrai si le record a été sauvegardé sinon false
 
-  Future<bool> saveRecord(int levelId, int newTimeInSeconds) async {
-    try {
-      final levelsBox = Hive.box<LevelModel>('levelsBox');
-
-      LevelModel? level = levelsBox.get(levelId);
-
-      if (level != null) {
-        level = level.copyWith(bestRecordNormalSeconds: newTimeInSeconds);
-        await level.save();
-        return true;
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print("erreur de sauvegarde du record : $e");
-      }
-    }
-    return false;
-  }
 
   /// Générateur de niveau
   ///

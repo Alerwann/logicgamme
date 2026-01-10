@@ -1,19 +1,18 @@
-import 'package:logic_game/models/hive/case/case_model.dart';
+import 'package:logic_game/models/hive/noBox/case/case_model.dart';
 import 'package:logic_game/models/models%20utils/data_for_painting.dart';
-import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:logic_game/utils/calcul_coordonnee.dart';
 import 'package:logic_game/widget/gamepage/path%20draw/animated_path_layer.dart';
 import 'package:flutter/material.dart';
 
 class PathPainter extends CustomPainter {
   final DataForAnimation provid;
-  final LevelModel level;
+  final int sizeLevel;
 
-  PathPainter({required this.level, required this.provid});
+  PathPainter({required this.sizeLevel, required this.provid});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final double cellSize = size.width / level.size;
+    final double cellSize = size.width / sizeLevel;
     final List<CaseModel> roadlist = provid.roadList;
 
     final CoordForPainting dataPainting = provid.coordForPainting;

@@ -1,13 +1,12 @@
 import 'package:logic_game/data/constants.dart';
 import 'package:logic_game/data/enum/enum.dart';
-import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:logic_game/providers/game_manager_provider.dart';
 import 'package:logic_game/utils/format_time.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TimerBanner extends ConsumerStatefulWidget {
-  final LevelModel level;
+  final int level;
   const TimerBanner({super.key, required this.level});
 
   @override

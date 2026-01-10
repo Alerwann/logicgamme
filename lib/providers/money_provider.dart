@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:logic_game/data/constants.dart';
 import 'package:logic_game/data/enum/enum.dart';
-import 'package:logic_game/models/hive/bonus/bonus_model.dart';
-import 'package:logic_game/models/hive/money/money_model.dart';
+import 'package:logic_game/models/hive/noBox/bonus/bonus_model.dart';
+import 'package:logic_game/models/hive/box/money/money_model.dart';
 import 'package:logic_game/providers/money_service_provider.dart';
 
 final moneyProvider = NotifierProvider<MoneyNotifier, MoneyModel>(() {

@@ -1,4 +1,4 @@
-import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
+import 'package:logic_game/models/hive/noBox/typebonus/type_bonus.dart';
 
 class ResultDialogueBonus {
   final int quantity;
