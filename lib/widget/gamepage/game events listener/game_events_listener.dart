@@ -7,6 +7,7 @@ import 'package:logic_game/providers/game_manager_provider.dart';
 import 'package:logic_game/providers/message_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logic_game/providers/money_provider.dart';
 
 class GameEventsListener extends ConsumerWidget {
   final LevelModel level;
@@ -85,7 +86,7 @@ class GameEventsListener extends ConsumerWidget {
   }
 
   void _initTimeMessage(BuildContext context, WidgetRef ref, LevelModel level) {
-    final money = ref.read(gameManagerProvider(level)).moneyData;
+    final money = ref.read(moneyProvider);
     final bonusTime = money.timeBonus;
     final quantity = bonusTime.quantity;
     final nombreGemme = money.gemeStock;
@@ -111,7 +112,7 @@ class GameEventsListener extends ConsumerWidget {
   }
 
   void _initDifficulty(BuildContext context, WidgetRef ref, LevelModel level) {
-    final money = ref.read(gameManagerProvider(level)).moneyData;
+    final money = ref.read(moneyProvider);
 
     final bonusDifficulty = money.difficultyBonus;
     final quantity = bonusDifficulty.quantity;

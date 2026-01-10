@@ -80,12 +80,14 @@ class HiveService {
       LevelModel? level = levelsBox.get(levelId);
 
       if (level != null) {
-        level.bestRecordNormalSeconds = newTimeInSeconds;
+        level = level.copyWith(bestRecordNormalSeconds: newTimeInSeconds);
         await level.save();
         return true;
       }
     } catch (e) {
-      if (kDebugMode) {}
+      if (kDebugMode) {
+        print("erreur de sauvegarde du record : $e");
+      }
     }
     return false;
   }

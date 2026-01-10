@@ -16,7 +16,7 @@ class GameMainLayout extends ConsumerWidget {
       body: SafeArea(
         child: Column(
           children: [
-            TopBannerWidget(level: level),
+            TopBannerWidget(levelId: level.levelId),
 
             Expanded(
               flex: 6,

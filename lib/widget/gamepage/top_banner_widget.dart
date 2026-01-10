@@ -1,17 +1,14 @@
-import 'package:logic_game/models/hive/level/level_model.dart';
-import 'package:logic_game/providers/game_manager_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logic_game/providers/money_provider.dart';
 
 class TopBannerWidget extends ConsumerWidget {
-  final LevelModel level;
-  const TopBannerWidget({super.key, required this.level});
+  final int levelId;
+  const TopBannerWidget({super.key, required this.levelId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(
-      gameManagerProvider(level).select((s) => (s.moneyData,)),
-    );
+    final moneyP = ref.watch(moneyProvider);
     return Container(
       height: 200,
       padding: EdgeInsets.only(top: 20),
@@ -27,7 +24,7 @@ class TopBannerWidget extends ConsumerWidget {
                 spacing: 10,
                 children: [
                   Text(
-                    "Niveau : ${level.levelId}",
+                    "Niveau : $levelId",
                     style: TextTheme.of(context).displayMedium,
                   ),
                   Expanded(
@@ -59,7 +56,7 @@ class TopBannerWidget extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  provider.$1.timeBonus.quantity.toString(),
+                                  moneyP.timeBonus.quantity.toString(),
                                   style: TextTheme.of(context).titleLarge,
                                 ),
                                 Image.asset(
@@ -74,7 +71,7 @@ class TopBannerWidget extends ConsumerWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  provider.$1.difficultyBonus.quantity
+                                 moneyP.difficultyBonus.quantity
                                       .toString(),
                                   style: TextTheme.of(context).titleLarge,
                                 ),
@@ -93,7 +90,7 @@ class TopBannerWidget extends ConsumerWidget {
                           spacing: 10,
                           children: [
                             Text(
-                              provider.$1.gemeStock.toString(),
+                             moneyP.gemeStock.toString(),
                               style: TextTheme.of(context).titleLarge,
                             ),
                             Image.asset(

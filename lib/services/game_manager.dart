@@ -4,11 +4,10 @@ import 'package:logic_game/data/enum/enum.dart';
 import 'package:logic_game/data/enum/typebonus/type_bonus.dart';
 import 'package:logic_game/models/hive/case/case_model.dart';
 import 'package:logic_game/models/hive/level/level_model.dart';
-import 'package:logic_game/models/hive/money/money_model.dart';
 import 'package:logic_game/models/tempory/session_state.dart';
 import 'package:logic_game/providers/message_provider.dart';
+import 'package:logic_game/providers/money_provider.dart';
 import 'package:logic_game/services/hive_service.dart';
-import 'package:logic_game/services/game_manager_util.dart/init_game_manager.dart';
 import 'package:logic_game/services/money_service.dart';
 import 'package:logic_game/services/move_manager_service.dart';
 import 'package:flutter/foundation.dart';
@@ -33,24 +32,46 @@ class GameManager extends StateNotifier<SessionState> {
   Set<CaseModel> get errorSetCase => _errorSetCase;
 
   final HiveService _hiveService;
-  final MoneyService _moneyService;
   final MoveManagerService _moveManageService;
+
+  bool _newRecord = false;
+  bool get newRecord => _newRecord;
 
   ///initialisation de la classe
   GameManager(
     LevelModel levelPlaying,
-    this._moneyService,
     this._hiveService,
     this._ref,
-    this._moveManageService, {
-    required MoneyModel initialMoney,
-  }) : super(calculerEtatInitial(levelPlaying, initialMoney)) {
+    this._moveManageService,
+  ) : super(_calculerEtatInitial(levelPlaying)) {
+    final initialMoney = _ref.read(moneyProvider);
+
     if (initialMoney.canUseBonusDifficulty) {
+      
       state = state.copyWith(statutPartie: EtatGame.waitDifficulty);
-      _waitDiff = stratWaitingDifficulty(state);
+
+      _waitDiff = Timer(
+        Duration(seconds: Constants.DURATION_PREVIEW_LEVEL),
+        () => state = state.copyWith(statutPartie: EtatGame.chooseDifficulty),
+      );
     } else {
       state = state.copyWith(statutPartie: EtatGame.isPlaying);
     }
+  }
+
+  /// Initialisation de l'état
+  static SessionState _calculerEtatInitial(LevelModel niveau) {
+    return SessionState(
+      levelConfig: niveau,
+      roadList: [niveau.firstCase],
+      roadSet: {niveau.firstCase},
+      lastTagSave: 1,
+      statutPartie: EtatGame.loading,
+      difficultyMode: TypeDifficulty.normal,
+      timerState: TimerAction.init,
+      error: ErrorPlayer.none,
+      stateGamePage: StateGamePage.playing,
+    );
   }
 
   // Gestion de la partie et ses mouvements
@@ -109,10 +130,10 @@ class GameManager extends StateNotifier<SessionState> {
     } else
     // Erreur du joueur dans sa technique
     // séparation du wall car par la même animation du résultat
-    if (codeFeedback == MoveStatusCode.error ) {
+    if (codeFeedback == MoveStatusCode.error) {
       _errorSetCase = errorCase != null ? {errorCase} : {};
 
-      final error = wallError!=null && wallError
+      final error = wallError != null && wallError
           ? ErrorPlayer.wall
           : ErrorPlayer.other;
 
@@ -140,7 +161,6 @@ class GameManager extends StateNotifier<SessionState> {
 
   void _checkEndGame(SessionState result) async {
     if (result.roadList.length == state.levelConfig.cases.length) {
-
       state = state.copyWith(timerState: TimerAction.win);
 
       _result = result;
@@ -209,6 +229,7 @@ class GameManager extends StateNotifier<SessionState> {
   ///
   Future<void> _saveRecord(int timeGame, SessionState state) async {
     if (state.levelConfig.bestRecordNormalSeconds > timeGame) {
+      _newRecord = true;
       try {
         await _hiveService.saveRecord(state.levelConfig.levelId, timeGame);
       } catch (e) {
@@ -219,32 +240,22 @@ class GameManager extends StateNotifier<SessionState> {
         }
       }
     } else {
-      _ref.read(messageProvider.notifier).state =
-          "Bravo ! Record non battu (actuel: ${state.levelConfig.bestRecordNormalSeconds}s)";
+      _newRecord = false;
     }
   }
 
   /// Si la partie est gagnée envoie la maj des information de [MoneyService]
   ///
   Future<void> _saveWinGame() async {
-    try {
-      ResultActionBonus returnState = await _moneyService.handleWinGame(
-        levelId: state.levelConfig.levelId,
-        difficultyMode: state.difficultyMode,
-        moneyState: state.moneyData,
-      );
-      if (returnState.isDo) {
-        state = state.copyWith(moneyData: returnState.state);
-      } else {
-        _ref.read(messageProvider.notifier).state =
-            "Le gain n'a pas pu être sauvegardé pour défaut de mémoire.";
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print("Erreur de sauvegarde suite à victoire : $e");
-      }
+    final moneyP = _ref.read(moneyProvider.notifier);
+
+    final majEndGame = await moneyP.majMoneyEndGame(
+      state.difficultyMode,
+      state.levelConfig.levelId,
+    );
+    if (!majEndGame) {
       _ref.read(messageProvider.notifier).state =
-          "Impossible de sauvegarder le score. ";
+          "Le gain n'a pas pu être sauvegardé pour défaut de mémoire.";
     }
   }
 
@@ -255,7 +266,8 @@ class GameManager extends StateNotifier<SessionState> {
 
   void canUseBonusTime() {
     ///modif en attendant popup
-    if (state.moneyData.canUseBonusTime) {
+    final useBonus = _ref.read(moneyProvider).canUseBonusTime;
+    if (useBonus) {
       //lancement du popup et traitement de la rep
       state = state.copyWith(statutPartie: EtatGame.chooseAddTime);
     } else {
@@ -283,27 +295,19 @@ class GameManager extends StateNotifier<SessionState> {
       _maxCurrentValue = Constants.DURATION_NORMAL_MODE;
       state = state.copyWith(statutPartie: EtatGame.isPlaying);
     } else {
-      try {
-        final resultBuy = await _moneyService.buyBonus(
-          state.moneyData,
-          TypeBonus.bonusDifficulty,
+      final moneyP = _ref.read(moneyProvider.notifier);
+
+      final resultBuy = await moneyP.buyDifficulty();
+
+      if (resultBuy) {
+        _maxCurrentValue = Constants.DURATION_HARD_MODE;
+        state = state.copyWith(
+          difficultyMode: TypeDifficulty.hard,
+          statutPartie: EtatGame.isPlaying,
         );
-
-        if (resultBuy.isDo) {
-          _maxCurrentValue = Constants.DURATION_HARD_MODE;
-          state = state.copyWith(
-            moneyData: resultBuy.state,
-            difficultyMode: TypeDifficulty.hard,
-            statutPartie: EtatGame.isPlaying,
-          );
-
-          _ref.read(messageProvider.notifier).state =
-              "Bonne chance pour le mode Hard !";
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          print("Erreur lors du changement de difficultées : $e");
-        }
+        _ref.read(messageProvider.notifier).state =
+            "Bonne chance pour le mode Hard !";
+      } else {
         _maxCurrentValue = Constants.DURATION_NORMAL_MODE;
         state = state.copyWith(statutPartie: EtatGame.isPlaying);
         _ref.read(messageProvider.notifier).state =
@@ -328,43 +332,47 @@ class GameManager extends StateNotifier<SessionState> {
     if (!chooseTime) {
       state = state.copyWith(stateGamePage: StateGamePage.loose);
     } else {
-      try {
-        final resultBuy = await _moneyService.buyBonus(
-          state.moneyData,
-          TypeBonus.bonusTime,
-        );
+     final moneyP = _ref.read(moneyProvider.notifier);
 
-        if (resultBuy.isDo) {
+      final resultBuy = await moneyP.buyTime();
+        if (resultBuy) {
           state = state.copyWith(
-            moneyData: resultBuy.state,
             difficultyMode: TypeDifficulty.normal,
             statutPartie: EtatGame.isPlaying,
             timerState: TimerAction.addTime,
           );
         }
-      } catch (e) {
-        if (kDebugMode) {
-          print("Erreur lors du changement de difficultées : $e");
-        }
+     else{
         state = state.copyWith(stateGamePage: StateGamePage.loose);
         _ref.read(messageProvider.notifier).state =
             "Achat du temps non finalisée, la partie est terminée";
-      }
+      }   
     }
   }
 
-
   /// fonction de la pause du timer sur demande du joueur
   ///si actuellement en pause passe en jeu et inversement
-  
+
   void pauseResumeTime(bool isPause) {
     final newStatue = isPause ? EtatGame.isPlaying : EtatGame.pause;
 
     state = state.copyWith(statutPartie: newStatue);
   }
 
-
   /// Permet le nettoyage des contrôleurs
+  ///
+
+  void resetForReplay() {
+    state = state.copyWith(
+      roadList: [state.levelConfig.firstCase],
+      roadSet: {state.levelConfig.firstCase},
+      lastTagSave: 1,
+      statutPartie: EtatGame.loading,
+      difficultyMode: TypeDifficulty.normal,
+      stateGamePage: StateGamePage.playing,
+      timerState: TimerAction.init,
+    );
+  }
 
   @override
   void dispose() {

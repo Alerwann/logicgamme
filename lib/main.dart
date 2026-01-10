@@ -10,7 +10,6 @@ import 'package:logic_game/services/hive_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:logic_game/services/money_service.dart';
 
 import 'models/hive/case/case_model.dart';
 
@@ -27,7 +26,7 @@ void main() async {
 
   await Hive.openBox<LevelModel>(Constants.levelBox);
   await Hive.openBox<MoneyModel>(Constants.moneyBox);
-  MoneyService.initMoney();
+
 
  HiveService.initLevels();
 

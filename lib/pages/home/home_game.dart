@@ -74,7 +74,7 @@ class HomeGame extends ConsumerWidget {
     final LevelModel level = levelsBox.getAt(1) ?? levelTest;
     //   print("levelid choisi = ${level.levelId}");
 
-    final money = ref.read(moneyProvider);
+    final money = ref.watch(moneyProvider);
     final moneyBox = Hive.box<MoneyModel>(Constants.moneyBox);
     // moneyBox.put(0, money);
 

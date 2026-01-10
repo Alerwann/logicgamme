@@ -2,7 +2,6 @@ import 'package:logic_game/data/enum/enum.dart';
 import 'package:logic_game/models/hive/case/case_model.dart';
 import 'package:logic_game/models/models%20utils/data_for_painting.dart';
 import 'package:logic_game/models/hive/level/level_model.dart';
-import 'package:logic_game/models/hive/money/money_model.dart';
 import 'package:flutter/foundation.dart';
 
 /// Réprésente l'état de la partie à un instant t
@@ -34,9 +33,6 @@ class SessionState {
   /// Définit si la partie est en mode Normal ou Hard
   final TypeDifficulty difficultyMode;
 
-  /// Définit l'état des monnaies
-  final MoneyModel moneyData;
-
   //Animation
 
   /// Les offsets pour la création du dessin
@@ -64,7 +60,6 @@ class SessionState {
     required this.lastTagSave,
     required this.statutPartie,
     required this.difficultyMode,
-    required this.moneyData,
     // animation du chemin
     this.dataPainting,
     this.animationProgress,
@@ -87,7 +82,6 @@ class SessionState {
     int? lastTagSave,
     EtatGame? statutPartie,
     TypeDifficulty? difficultyMode,
-    MoneyModel? moneyData,
     (bool, bool)? canBuyTimeDiff,
     CoordForPainting? dataPainting,
     double? animationProgress,
@@ -102,7 +96,6 @@ class SessionState {
       lastTagSave: lastTagSave ?? this.lastTagSave,
       statutPartie: statutPartie ?? this.statutPartie,
       difficultyMode: difficultyMode ?? this.difficultyMode,
-      moneyData: moneyData ?? this.moneyData,
       dataPainting: dataPainting,
       animationProgress: animationProgress,
       timerState: timerState ?? this.timerState,
@@ -126,7 +119,6 @@ class SessionState {
           lastTagSave == other.lastTagSave &&
           statutPartie == other.statutPartie &&
           difficultyMode == other.difficultyMode &&
-          moneyData == other.moneyData &&
           dataPainting == other.dataPainting &&
           animationProgress == other.animationProgress &&
           timerState == other.timerState &&
@@ -140,7 +132,6 @@ class SessionState {
     Object.hashAll(roadSet),
     statutPartie,
     difficultyMode,
-    moneyData,
     dataPainting,
     animationProgress,
     timerState,

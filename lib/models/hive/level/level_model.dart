@@ -27,7 +27,6 @@ class LevelModel extends HiveObject {
 
   /// Quand le joueur à gagné un niveau son temps est enregistré
   /// Il peut ainsi le rejouer pour l'améliorer et battre son record
-
   @HiveField(5)
   late int bestRecordNormalSeconds;
 
@@ -39,6 +38,23 @@ class LevelModel extends HiveObject {
     required this.size,
     this.bestRecordNormalSeconds = 99999,
   });
+
+  LevelModel copyWith({
+    int? levelId,
+    List<CaseModel>? cases,
+    CaseModel? firstCase,
+    int? maxTag,
+    int? size,
+    int? bestRecordNormalSeconds,
+  }) {
+    return LevelModel(
+      levelId: levelId ?? this.levelId,
+      cases: cases ?? this.cases,
+      firstCase: firstCase ?? this.firstCase,
+      maxTag: maxTag ?? this.maxTag,
+      size: size ?? this.size,
+    );
+  }
 
   /// Compare deux instances de [LevelModel] par leurs valeurs.
   ///

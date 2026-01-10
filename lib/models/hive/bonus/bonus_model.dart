@@ -33,7 +33,6 @@ class BonusModel {
     TypeBonus? nameBonus,
     int? costForBuy,
     int? quantity,
-    bool? canBuy,
     int? gain,
   }) {
     return BonusModel(

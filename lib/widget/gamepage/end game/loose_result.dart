@@ -1,12 +1,16 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logic_game/models/hive/level/level_model.dart';
 import 'package:flutter/material.dart';
+import 'package:logic_game/pages/home/home_game.dart';
+import 'package:logic_game/pages/list_level.dart';
+import 'package:logic_game/providers/game_manager_provider.dart';
 
-class LooseResult extends StatelessWidget {
+class LooseResult extends ConsumerWidget {
   final LevelModel level;
   const LooseResult({super.key, required this.level});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Sorry"),
@@ -20,11 +24,30 @@ class LooseResult extends StatelessWidget {
             Text(
               "Essaie de nouveau le niveau, ou entraine toi sur les anciens",
             ),
-            ElevatedButton(onPressed: () {
-              
-            }, child: Text("Rejouer")),
-            ElevatedButton(onPressed: () {}, child: Text("Liste des niveaux")),
-            ElevatedButton(onPressed: () {}, child: Text("Accueil")),
+            ElevatedButton(
+              onPressed: () {
+                ref.read(gameManagerProvider(level).notifier).resetForReplay();
+              },
+              child: Text("Rejouer"),
+            ),
+            ElevatedButton(
+                onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ListLevel()),
+                );
+              },
+              child: Text("Liste des niveau/"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeGame()),
+                );
+              },
+              child: Text("Accueil"),
+            ),
           ],
         ),
       ),
