@@ -18,7 +18,6 @@ class _TimerBannerState extends ConsumerState<TimerBanner>
   late AnimationController controller;
 
   int dureeMax = 60;
-  // double ratio = 1;
 
   int initCompteurValue = 0;
 

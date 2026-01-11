@@ -19,7 +19,7 @@ class HiveService {
   ///   - false si soit aucun niveau n'est trouvé dans le fichier soit si la création de niveau à échoué
   /// le string permet de retourner le commentaire à afficher
   ///
-  static (bool, String) initLevels() {
+  static Future<(bool, String)> initLevels() async {
     List<LevelsImport> allLevels = AllLevel.getDefaultList();
 
     if (allLevels.isEmpty || allLevels.length > allLevels.toSet().length) {
@@ -51,8 +51,13 @@ class HiveService {
           maxTag: maxTag,
           size: result.size!,
         );
-        levelsBox.put(i, value);
-      } else if (!result.success) {
+        try {
+          await levelsBox.put(i, value);
+        } catch (e) {
+          print("erreur de sauvegarde du niveau $i : $e");
+          return (false, "La sauvegarde du niveau $i a échoué");
+        }
+      } else {
         return (
           false,
           "La création du niveau $i a échoué. Veuillez contacter le support en mentionnant le niveau et code erreur : TAG",
@@ -61,8 +66,6 @@ class HiveService {
     }
     return (true, "Les niveaux ont été initialisé, Bonne chance");
   }
-
-
 
   /// Générateur de niveau
   ///
