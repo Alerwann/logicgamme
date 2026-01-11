@@ -225,10 +225,7 @@ class GameManager extends StateNotifier<SessionState> {
   }
 
   Future<void> finishGame(int timeGame) async {
-    print("win finish time: $timeGame");
-
     await _saveRecord(timeGame, state);
-    await _saveWinGame();
     _startAnimationTimer(true, _result);
   }
 
@@ -243,6 +240,13 @@ class GameManager extends StateNotifier<SessionState> {
         .saveEndGame(timeGame, difficulty);
 
     _newRecord = levelData.record;
+    final isalreadyHard = _ref
+        .read(levelProfilProvider(state.levelId))
+        .winWithHard;
+
+    if (!isalreadyHard || levelData.record) {
+      await _saveWinGame();
+    }
 
     if (!levelData.save) {
       _ref.read(messageProvider.notifier).state =
