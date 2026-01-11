@@ -245,6 +245,7 @@ class GameManager extends StateNotifier<SessionState> {
         .winWithHard;
 
     if (!isalreadyHard || levelData.record) {
+      print("ajout de gemme");
       await _saveWinGame();
     }
 

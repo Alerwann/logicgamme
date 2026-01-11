@@ -150,4 +150,20 @@ class MoneyNotifier extends Notifier<MoneyModel> {
 
     return await saveData(newState);
   }
+
+  Future<bool> resetMoneyData() async {
+    final newTimeBonus = state.timeBonus.copyWith(
+      quantity: Constants.DAILY_ADDTIME_BONUS_COUN,
+    );
+    final newdiffBonus = state.difficultyBonus.copyWith(
+      quantity: Constants.DAILY_DIFFICULTY_COUNT,
+    );
+
+    final newState = state.copyWith(
+      gemeStock: 0,
+      timeBonus: newTimeBonus,
+      difficultyBonus: newdiffBonus,
+    );
+    return await saveData(newState);
+  }
 }

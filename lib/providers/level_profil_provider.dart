@@ -49,4 +49,16 @@ class LevelProfilNotifier extends FamilyNotifier<LevelProfilModel, int> {
     }
     return ResultSaveRecord(record: isNewRecord, save: false);
   }
+
+  Future<bool> resetLevelData() async {
+    final initBox = state.copyWith(winWithHard: false, bestTime: 99999);
+    final saveReset = await ref
+        .read(levelProfilServiceProvider)
+        .saveData(initBox);
+    if (saveReset) {
+      state = initBox;
+   
+    }
+    return saveReset;
+  }
 }

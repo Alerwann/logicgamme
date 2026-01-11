@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:logic_game/pages/home/home_game.dart';
 import 'package:logic_game/pages/list_level.dart';
 import 'package:logic_game/providers/game_manager_provider.dart';
+import 'package:logic_game/providers/level_profil_provider.dart';
 
 class WinResult extends ConsumerWidget {
   final int level;
@@ -10,16 +11,10 @@ class WinResult extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bool newRecord = ref
-        .read(gameManagerProvider(level).notifier)
-        .newRecord;
-    // final time = ref.read(
-    //   gameManagerProvider(
-    //     level,
-    //   ).select((s) => s.levelConfig.bestRecordNormalSeconds),
-    // );
-    final time = 12;
-    
+    final levelProfil = ref.read(levelProfilProvider(level));
+    final bool newRecord = ref.read(gameManagerProvider(level).notifier).newRecord;
+    final time = levelProfil.bestTime;
+
     final minutes = (time ~/ 60).toString().padLeft(2, '0');
     final seconds = (time % 60).toString().padLeft(2, '0');
     return Scaffold(
@@ -54,7 +49,7 @@ class WinResult extends ConsumerWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushReplacement(
+                Navigator.pop(
                   context,
                   MaterialPageRoute(builder: (context) => HomeGame()),
                 );
