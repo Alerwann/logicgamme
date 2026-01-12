@@ -13,13 +13,14 @@ class HomeGame extends ConsumerWidget {
 
     final levelId = 1;
 
-
-
     final money = ref.watch(moneyProvider);
     final levelprofil = ref.watch(levelProfilProvider(levelId));
 
+    /// implantattion du choix se fera plus tard
+    final storyMode = false;
+
     return Scaffold(
-      appBar: AppBar(title: Text("Everyone"),automaticallyImplyLeading: false,),
+      appBar: AppBar(title: Text("Everyone"), automaticallyImplyLeading: false),
       body: Center(
         child: Column(
           children: [
@@ -36,7 +37,8 @@ class HomeGame extends ConsumerWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => GamePage(level: levelId),
+                    builder: (context) =>
+                        GamePage(level: levelId, storyMode: storyMode),
                   ),
                 );
               },

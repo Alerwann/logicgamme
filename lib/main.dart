@@ -2,6 +2,7 @@ import 'package:logic_game/Theme/material_theme.dart';
 import 'package:logic_game/Theme/text_theme.dart';
 
 import 'package:logic_game/data/constants.dart';
+import 'package:logic_game/models/hive/noBox/story%20mod/story_data.dart';
 import 'package:logic_game/models/hive/noBox/typebonus/type_bonus.dart';
 
 import 'package:logic_game/models/hive/noBox/bonus/bonus_model.dart';
@@ -36,6 +37,8 @@ void main() async {
   Hive.registerAdapter(BonusModelAdapter());
   //typeId 12
   Hive.registerAdapter(TypeBonusAdapter());
+  //typeId 13
+  Hive.registerAdapter(StoryDataAdapter());
 
   await Hive.openBox<LevelModel>(Constants.levelBox);
   await Hive.openBox<MoneyModel>(Constants.moneyBox);

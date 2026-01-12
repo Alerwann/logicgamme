@@ -9,12 +9,13 @@ import 'package:flutter/material.dart';
 
 class GridBanner extends StatelessWidget {
   final int levelId;
-  const GridBanner({super.key, required this.levelId});
+  final bool storyMode;
+  const GridBanner({super.key, required this.levelId, required this.storyMode});
 
   @override
   Widget build(BuildContext context) {
     final level = Hive.box<LevelModel>(Constants.levelBox).get(levelId)!;
-    final sizeLevel =level.size;
+    final sizeLevel = level.size;
 
     return LayoutBuilder(
       builder: (contex, constraints) {
@@ -35,7 +36,7 @@ class GridBanner extends StatelessWidget {
                 ),
 
                 // dessin des cases
-                CaseWidget(level: level),
+                CaseWidget(level: level, storyMode: storyMode),
                 // Erreur et geste
                 ErrorGestureGestion(level: level),
               ],

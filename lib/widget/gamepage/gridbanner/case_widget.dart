@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 
 class CaseWidget extends StatelessWidget {
   final LevelModel level;
-  const CaseWidget({super.key, required this.level});
+  final bool storyMode;
+  const CaseWidget({super.key, required this.level, required this.storyMode});
 
   @override
   Widget build(BuildContext context) {
     final BorderSide borderDeco = BorderSide(color: Colors.black, width: 5);
-  
 
     return GridView.builder(
       physics: const NeverScrollableScrollPhysics(),
@@ -41,7 +41,9 @@ class CaseWidget extends StatelessWidget {
                     ),
                     child: Center(
                       child: Text(
-                        levelCaseData.numberTag.toString(),
+                        storyMode
+                            ? level.storyData.solution[levelCaseData.numberTag!]
+                            : levelCaseData.numberTag.toString(),
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.white, fontSize: 30),
                       ),

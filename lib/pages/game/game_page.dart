@@ -9,7 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class GamePage extends ConsumerWidget {
   final int level;
-  const GamePage({super.key, required this.level});
+  final bool storyMode;
+  const GamePage({super.key, required this.level, required this.storyMode});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -30,7 +31,7 @@ class GamePage extends ConsumerWidget {
   Widget _buildBody(StateGamePage status, int level) {
     switch (status) {
       case StateGamePage.playing:
-        return GameMainLayout(level: level);
+        return GameMainLayout(level: level, storyMode: storyMode);
       case StateGamePage.win:
         return WinResult(level: level);
       case StateGamePage.loose:

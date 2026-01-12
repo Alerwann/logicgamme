@@ -1,6 +1,7 @@
 import 'package:logic_game/models/hive/noBox/case/case_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:logic_game/models/hive/noBox/story%20mod/story_data.dart';
 
 part 'level_model.g.dart';
 
@@ -24,6 +25,8 @@ class LevelModel extends HiveObject {
   int maxTag;
   @HiveField(4)
   int size;
+  @HiveField(5)
+  StoryData storyData;
 
   LevelModel({
     required this.levelId,
@@ -31,6 +34,7 @@ class LevelModel extends HiveObject {
     required this.firstCase,
     required this.maxTag,
     required this.size,
+    required this.storyData,
   });
 
   LevelModel copyWith({
@@ -39,6 +43,7 @@ class LevelModel extends HiveObject {
     CaseModel? firstCase,
     int? maxTag,
     int? size,
+    StoryData? storyData
   }) {
     return LevelModel(
       levelId: levelId ?? this.levelId,
@@ -46,6 +51,7 @@ class LevelModel extends HiveObject {
       firstCase: firstCase ?? this.firstCase,
       maxTag: maxTag ?? this.maxTag,
       size: size ?? this.size,
+      storyData: storyData?? this.storyData,
     );
   }
 
@@ -61,15 +67,11 @@ class LevelModel extends HiveObject {
           listEquals(cases, other.cases) &&
           firstCase == other.firstCase &&
           maxTag == other.maxTag &&
-          size == other.size;
+          size == other.size &&
+          storyData==other.storyData;
 
   /// Génère une clé de hachage basée sur l'ensemble des propriétés de la case.
   @override
-  int get hashCode => Object.hash(
-    levelId,
-    Object.hashAll(cases),
-    firstCase,
-    maxTag,
-    size,
-  );
+  int get hashCode =>
+      Object.hash(levelId, Object.hashAll(cases), firstCase, maxTag, size, storyData);
 }

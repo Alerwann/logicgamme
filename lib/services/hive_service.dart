@@ -7,6 +7,7 @@ import 'package:logic_game/models/hive/noBox/case/case_model.dart';
 import 'package:logic_game/models/hive/box/level/level_model.dart';
 import 'package:collection/collection.dart';
 import 'package:hive/hive.dart';
+import 'package:logic_game/models/hive/noBox/story%20mod/story_data.dart';
 
 /// Service qui gère la création et la sauvegarde des niveaux
 ///
@@ -43,6 +44,7 @@ class HiveService {
         final List<CaseModel> casesFinales = result.cases!;
         final CaseModel firstCase = result.firstTagCase!;
         final int maxTag = result.maxTag!;
+        final StoryData storyData = allLevels[i].storyData;
 
         LevelModel value = LevelModel(
           levelId: i,
@@ -50,6 +52,7 @@ class HiveService {
           firstCase: firstCase,
           maxTag: maxTag,
           size: result.size!,
+          storyData: storyData,
         );
         try {
           await levelsBox.put(i, value);
@@ -81,7 +84,8 @@ class HiveService {
 
     /// vérifie que sur le niveau la liste des tag est complete sans doublons
     if (levelImport.tagsList.isEmpty ||
-        levelImport.tagsList.length > levelImport.tagsList.toSet().length) {
+        levelImport.tagsList.length > levelImport.tagsList.toSet().length ||
+        levelImport.tagsList.length != levelImport.storyData.solution.length) {
       return ResultLevelGenerator(
         success: false,
         codeResult: CodeLevelGenerator.countTagKo,

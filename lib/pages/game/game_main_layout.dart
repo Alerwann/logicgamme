@@ -3,10 +3,14 @@ import 'package:logic_game/widget/gamepage/timer/timer_banner.dart';
 import 'package:logic_game/widget/gamepage/top_banner_widget.dart';
 import 'package:flutter/material.dart';
 
-
 class GameMainLayout extends StatelessWidget {
   final int level;
-  const GameMainLayout({super.key, required this.level});
+  final bool storyMode;
+  const GameMainLayout({
+    super.key,
+    required this.level,
+    required this.storyMode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +25,9 @@ class GameMainLayout extends StatelessWidget {
               child: Column(
                 children: [
                   TimerBanner(level: level),
-                  Expanded(child: GridBanner(levelId: level)),
+                  Expanded(
+                    child: GridBanner(levelId: level, storyMode: storyMode),
+                  ),
                 ],
               ),
             ),
